@@ -14,17 +14,17 @@ class IpTvApi {
       if (user.domain == "https://demo.gmax.iptv") {
         if (type == "get_live_categories") {
           return [
-            CategoryModel(categoryId: "1", categoryName: "Arabic & Global News", parentId: 0),
-            CategoryModel(categoryId: "2", categoryName: "Sports & Science", parentId: 0),
+            CategoryModel(categoryId: "1", categoryName: "Arabic & Global News", parentId: "0"),
+            CategoryModel(categoryId: "2", categoryName: "Sports & Science", parentId: "0"),
           ];
         } else if (type == "get_vod_categories") {
           return [
-            CategoryModel(categoryId: "10", categoryName: "Action & Sci-Fi", parentId: 0),
-            CategoryModel(categoryId: "11", categoryName: "Animation & Cinema", parentId: 0),
+            CategoryModel(categoryId: "10", categoryName: "Action & Sci-Fi", parentId: "0"),
+            CategoryModel(categoryId: "11", categoryName: "Animation & Cinema", parentId: "0"),
           ];
         } else {
           return [
-            CategoryModel(categoryId: "20", categoryName: "Featured Series", parentId: 0),
+            CategoryModel(categoryId: "20", categoryName: "Featured Series", parentId: "0"),
           ];
         }
       }
