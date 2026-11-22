@@ -1,0 +1,2 @@
+/Users/MAC/Documents/Work/Laregley/Applications/Azul IpTV/gmax/gmax_iptv/android/app/.cxx/Debug/5j3b4a4w/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/MAC/Documents/Work/Laregley/Applications/Azul IpTV/gmax/gmax_iptv/android/app/.cxx/Debug/5j3b4a4w/armeabi-v7a/CMakeFiles/rebuild_cache.dir
