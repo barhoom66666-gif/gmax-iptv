@@ -1,7 +1,7 @@
 part of 'helpers.dart';
 
-const String kAppName = "IA ALZAABI";
-const String kAppNamePro = 'IA ALZAABI VIP';
+const String kAppName = "Alzaabi TV";
+const String kAppNamePro = 'Alzaabi TV VIP';
 const String kAppId = "com.gmax.iptv";
 const String kAppVersion = "3.8";
 

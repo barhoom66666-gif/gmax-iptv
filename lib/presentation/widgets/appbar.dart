@@ -110,7 +110,7 @@ class CardLogoApp extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          "IA ALZAABI",
+          "Alzaabi TV",
           style: styleTitle.copyWith(
             fontSize: 15,
             color: const Color(0xFFFCE38A),

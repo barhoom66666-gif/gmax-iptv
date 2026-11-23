@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      "IA ALZAABI",
+                      "Alzaabi TV",
                       style: styleTitle.copyWith(
                         fontSize: 18,
                         color: const Color(0xFFFCE38A),
@@ -398,8 +398,8 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 kIsArabicLang
-                    ? "IA ALZAABI — النسخة العربية المفعلة"
-                    : "IA ALZAABI — Licensed Edition",
+                    ? "Alzaabi TV — النسخة العربية المفعلة"
+                    : "Alzaabi TV — Licensed Edition",
                 style: styleBody.copyWith(
                   fontSize: 11.5,
                   color: const Color(0xFFD5B055),
