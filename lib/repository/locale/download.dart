@@ -6,35 +6,26 @@ class ChannelsLocale {
       List<CategoryModel> list, String type) async {
     try {
       final user = await AuthLocale.getUser();
+      if (user == null) return false;
 
-      //TODO: save Categories to sql database
-      for (var caty in list) {
-        //check if item exist
-        final List<Map> existingRecord = await _sqlDb.readDataQuery(
+      final mydb = await _sqlDb.db;
+      if (mydb == null) return false;
+
+      await mydb.transaction((txn) async {
+        await txn.delete(
           tableCategories,
-          where: 'category_id = ? AND account_name = ?',
-          whereArgs: [caty.categoryId, user!.accountName],
+          where: 'type = ? AND account_name = ?',
+          whereArgs: [type, user.accountName],
         );
-
-        if (existingRecord.isEmpty) {
-          Map<String, dynamic> mapCaty = caty.toJson();
+        final batch = txn.batch();
+        for (final caty in list) {
+          final Map<String, dynamic> mapCaty = caty.toJson();
           mapCaty['account_name'] = user.accountName;
           mapCaty['type'] = type;
-
-          //create one
-          int res = await _sqlDb.insertMapData(
-            tableCategories,
-            mapCaty,
-          );
-          debugPrint(
-              "CHANNEL POST: ${user.accountName} || ${caty.categoryName} || RES:$res");
-        } else {
-          //update or ignore
-          debugPrint(
-              "CHANNEL Exist: ${user.accountName} || ${caty.categoryName} || ${existingRecord.first['id']}");
-          // final model = existingRecord.first;
+          batch.insert(tableCategories, mapCaty);
         }
-      }
+        await batch.commit(noResult: true);
+      });
 
       return true;
     } catch (e) {
@@ -124,6 +115,15 @@ class MoviesLocale {
       {int? page, int? pageSize}) async {
     try {
       final user = await AuthLocale.getUser();
+      if (user == null) return [];
+
+      if (user.domain != "https://demo.gmax.iptv") {
+        final remote = await IpTvApi.getMoviesByCatyRemote(catyId);
+        if (page != null && pageSize != null && remote.length > pageSize) {
+          return remote.take(pageSize).toList();
+        }
+        return remote;
+      }
 
       //TODO: get Movies by caty
       final offset = page == null ? null : (page - 1) * (pageSize ?? 10);
@@ -133,10 +133,8 @@ class MoviesLocale {
         offset: offset,
         limit: pageSize,
         where: "stream_type = ? AND account_name = ? AND category_id = ?",
-        whereArgs: ["movie", user!.accountName, catyId],
+        whereArgs: ["movie", user.accountName, catyId],
       );
-
-      // debugPrint("MOVIES: $catyId ${database.length}");
 
       return database.map((e) => ChannelMovie.fromJson(e)).toList();
     } catch (e) {
@@ -222,6 +220,15 @@ class LiveLocale {
       {int? page, int? pageSize}) async {
     try {
       final user = await AuthLocale.getUser();
+      if (user == null) return [];
+
+      if (user.domain != "https://demo.gmax.iptv") {
+        final remote = await IpTvApi.getLiveByCatyRemote(catyId);
+        if (page != null && pageSize != null && remote.length > pageSize) {
+          return remote.take(pageSize).toList();
+        }
+        return remote;
+      }
 
       final offset = page == null ? null : (page - 1) * (pageSize ?? 10);
 
@@ -230,7 +237,7 @@ class LiveLocale {
         limit: pageSize,
         offset: offset,
         where: "account_name = ? AND category_id = ?",
-        whereArgs: [user!.accountName, catyId],
+        whereArgs: [user.accountName, catyId],
       );
       return database.map((e) => ChannelLive.fromJson(e)).toList();
     } catch (e) {
@@ -320,6 +327,15 @@ class TvSHowsLocale {
       {int? page, int? pageSize}) async {
     try {
       final user = await AuthLocale.getUser();
+      if (user == null) return [];
+
+      if (user.domain != "https://demo.gmax.iptv") {
+        final remote = await IpTvApi.getSeriesByCatyRemote(catyId);
+        if (page != null && pageSize != null && remote.length > pageSize) {
+          return remote.take(pageSize).toList();
+        }
+        return remote;
+      }
 
       //TODO: get Series from Sqldb
 
@@ -330,7 +346,7 @@ class TvSHowsLocale {
         limit: pageSize,
         offset: offset,
         where: "stream_type = ? AND account_name = ? AND category_id = ?",
-        whereArgs: ["serie", user!.accountName, catyId],
+        whereArgs: ["serie", user.accountName, catyId],
       );
 
       return database.map((e) => ChannelSerie.fromJson(e)).toList();

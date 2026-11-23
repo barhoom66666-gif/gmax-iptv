@@ -62,15 +62,15 @@ class _RegisterPageState extends State<RegisterPage>
                             FilledButton(
                               onPressed: () {
                                 context.read<AuthBloc>().add(AuthRegister(
-                                      "demo",
-                                      "demo",
-                                      "https://demo.gmax.iptv",
-                                      "8K Gold Demo",
+                                      "8524fa5c8798",
+                                      "a1aeb0b2de",
+                                      "http://cf.business-cloud-8.ru:8080",
+                                      "Alzaabi 8K VIP",
                                       typeLogin: "XTREME",
                                     ));
                               },
                               child: Text(
-                                "▶ تشغيل باقة 8K التجريبية",
+                                "▶ تشغيل اشتراكي الفوري (World 8K)",
                                 style: styleBody.copyWith(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,

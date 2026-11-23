@@ -118,7 +118,7 @@ class _CardM3UState extends State<CardM3U> {
           progress: widget.isLoading,
           onSave: () async {
             try {
-              var txt = _m3u.text;
+              var txt = _m3u.text.trim().replaceAll(RegExp(r'\s+'), '');
               if (txt.isEmpty) {
                 showSoftToast("Enter your name and M3U/XTREME url");
                 return;
@@ -229,10 +229,10 @@ class CardXTREAM extends StatefulWidget {
 }
 
 class _CardXTREAMState extends State<CardXTREAM> {
-  final _name = TextEditingController();
-  final _username = TextEditingController();
-  final _password = TextEditingController();
-  final _domain = TextEditingController();
+  final _name = TextEditingController(text: "Alzaabi 8K VIP");
+  final _username = TextEditingController(text: "8524fa5c8798");
+  final _password = TextEditingController(text: "a1aeb0b2de");
+  final _domain = TextEditingController(text: "http://cf.business-cloud-8.ru:8080");
 
   @override
   Widget build(BuildContext context) {

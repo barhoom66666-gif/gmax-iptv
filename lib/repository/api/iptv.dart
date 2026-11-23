@@ -1,6 +1,39 @@
 part of 'api.dart';
 
 class IpTvApi {
+  static final Map<String, List<ChannelLive>> _liveCatCache = {};
+  static final Map<String, List<ChannelMovie>> _movieCatCache = {};
+  static final Map<String, List<ChannelSerie>> _serieCatCache = {};
+
+  static void clearMemoryCaches() {
+    _liveCatCache.clear();
+    _movieCatCache.clear();
+    _serieCatCache.clear();
+  }
+
+  static bool _isArabicOrSportsPriority(String name) {
+    final u = name.toUpperCase();
+    return u.contains("AR|") ||
+        u.contains("AR ") ||
+        u.contains("ARAB") ||
+        u.contains("BEIN") ||
+        u.contains("OSN") ||
+        u.contains("MBC") ||
+        u.contains("SHAHID") ||
+        u.contains("STARZ") ||
+        u.contains("WATCH IT") ||
+        u.contains("UAE") ||
+        u.contains("KSA") ||
+        u.contains("GULF") ||
+        name.contains("عرب") ||
+        name.contains("شاهد") ||
+        name.contains("مسلسلات") ||
+        name.contains("أفلام") ||
+        name.contains("افلام") ||
+        name.contains("خليج") ||
+        name.contains("رياض");
+  }
+
   /// Categories
   Future<List<CategoryModel>> getCategories(String type) async {
     try {
@@ -49,9 +82,16 @@ class IpTvApi {
         final List<dynamic> json = jsonDecode(response.data ?? "[]");
 
         final list = json.map((e) => CategoryModel.fromJson(e)).toList();
-        //  save list to locale
-
-        return list;
+        final priority = <CategoryModel>[];
+        final rest = <CategoryModel>[];
+        for (final item in list) {
+          if (_isArabicOrSportsPriority(item.categoryName ?? "")) {
+            priority.add(item);
+          } else {
+            rest.add(item);
+          }
+        }
+        return [...priority, ...rest];
       } else {
         debugPrint("Can't get $type: ${response.statusCode}");
         showWarningToast(
@@ -455,6 +495,102 @@ class IpTvApi {
     } catch (e) {
       debugPrint("Error MovSerie $serieId: $e");
       return null;
+    }
+  }
+
+  static Future<List<ChannelLive>> getLiveByCatyRemote(String catyId) async {
+    try {
+      final user = await AuthLocale.getUser();
+      if (user == null) return [];
+      final cacheKey = "${user.accountName}_$catyId";
+      if (_liveCatCache.containsKey(cacheKey)) {
+        return _liveCatCache[cacheKey]!;
+      }
+      final url = "${user.domain}/player_api.php";
+      final Response<String> response = await _dio.get(
+        url,
+        queryParameters: {
+          "password": user.userInfo!.password,
+          "username": user.userInfo!.username,
+          "action": "get_live_streams",
+          "category_id": catyId,
+        },
+        options: _options,
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> json = jsonDecode(response.data ?? "[]");
+        final list = json.map((e) => ChannelLive.fromJson(e)).toList();
+        _liveCatCache[cacheKey] = list;
+        return list;
+      }
+      return [];
+    } catch (e) {
+      debugPrint("Error getLiveByCatyRemote $catyId: $e");
+      return [];
+    }
+  }
+
+  static Future<List<ChannelMovie>> getMoviesByCatyRemote(String catyId) async {
+    try {
+      final user = await AuthLocale.getUser();
+      if (user == null) return [];
+      final cacheKey = "${user.accountName}_$catyId";
+      if (_movieCatCache.containsKey(cacheKey)) {
+        return _movieCatCache[cacheKey]!;
+      }
+      final url = "${user.domain}/player_api.php";
+      final Response<String> response = await _dio.get(
+        url,
+        queryParameters: {
+          "password": user.userInfo!.password,
+          "username": user.userInfo!.username,
+          "action": "get_vod_streams",
+          "category_id": catyId,
+        },
+        options: _options,
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> json = jsonDecode(response.data ?? "[]");
+        final list = json.map((e) => ChannelMovie.fromJson(e)).toList();
+        _movieCatCache[cacheKey] = list;
+        return list;
+      }
+      return [];
+    } catch (e) {
+      debugPrint("Error getMoviesByCatyRemote $catyId: $e");
+      return [];
+    }
+  }
+
+  static Future<List<ChannelSerie>> getSeriesByCatyRemote(String catyId) async {
+    try {
+      final user = await AuthLocale.getUser();
+      if (user == null) return [];
+      final cacheKey = "${user.accountName}_$catyId";
+      if (_serieCatCache.containsKey(cacheKey)) {
+        return _serieCatCache[cacheKey]!;
+      }
+      final url = "${user.domain}/player_api.php";
+      final Response<String> response = await _dio.get(
+        url,
+        queryParameters: {
+          "password": user.userInfo!.password,
+          "username": user.userInfo!.username,
+          "action": "get_series",
+          "category_id": catyId,
+        },
+        options: _options,
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> json = jsonDecode(response.data ?? "[]");
+        final list = json.map((e) => ChannelSerie.fromJson(e)).toList();
+        _serieCatCache[cacheKey] = list;
+        return list;
+      }
+      return [];
+    } catch (e) {
+      debugPrint("Error getSeriesByCatyRemote $catyId: $e");
+      return [];
     }
   }
 }

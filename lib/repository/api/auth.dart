@@ -10,12 +10,19 @@ class AuthApi {
     bool addToPlayList,
   ) async {
     try {
-      if (url == "https://demo.gmax.iptv" || username == "demo") {
+      final cleanUser = username.trim();
+      final cleanPass = password.trim();
+      var cleanUrl = url.trim().replaceAll(RegExp(r'\s+'), '').replaceAll(RegExp(r'/+$'), '');
+      if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+        cleanUrl = 'http://$cleanUrl';
+      }
+
+      if (cleanUrl == "https://demo.gmax.iptv" || cleanUser == "demo") {
         final demoJson = {
           "user_info": {
             "username": "demo",
             "password": "demo",
-            "message": "GMAX Demo Active",
+            "message": "Alzaabi TV Demo Active",
             "auth": 1,
             "status": "Active",
             "exp_date": "1893456000",
@@ -33,11 +40,12 @@ class AuthApi {
             "rtmp_port": "80",
             "timezone": "UTC",
             "timestamp_now": 1700000000,
-            "time_now": "2026-11-22 12:00:00",
+            "time_now": "2026-11-23 12:00:00",
             "process": true
           }
         };
-        final user = UserModel.fromJson(demoJson, accountName, "https://demo.gmax.iptv", typeLogin, 1);
+        final user = UserModel.fromJson(
+            demoJson, accountName, "https://demo.gmax.iptv", typeLogin, 1);
         await AuthLocale.logOut();
         if (addToPlayList) {
           await AuthLocale.saveUser(user);
@@ -47,30 +55,57 @@ class AuthApi {
         return user;
       }
 
-      var link = "$url/player_api.php?username=$username&password=$password";
-
-      final Response<String> response = await _dio.get(link);
-
-      if (response.statusCode == 200) {
-        var json = jsonDecode(response.data ?? "");
-        final user = UserModel.fromJson(json, accountName, url, typeLogin, 1);
-
-        if (addToPlayList) {
-          //create new
-          await AuthLocale.logOut();
-          await AuthLocale.saveUser(user);
-        } else {
-          //update user active to 1
-          await AuthLocale.logOut();
-          await AuthLocale.updateStatusUser(user.accountName);
-        }
-
-        return user;
+      // Build candidate URLs: try :8080 and :2095 automatically to bypass ISP port-80 blocks (like Etisalat safe.etisalat.ae)
+      final Uri parsed = Uri.parse(cleanUrl);
+      final String baseHost = "${parsed.scheme}://${parsed.host}";
+      final List<String> candidates = [];
+      if (!parsed.hasPort || parsed.port == 80) {
+        candidates.add("$baseHost:8080");
+        candidates.add("$baseHost:2095");
+        candidates.add(cleanUrl);
       } else {
-        debugPrint("Error ${response.statusCode}");
-
-        return null;
+        candidates.add(cleanUrl);
+        if (parsed.port != 8080) candidates.add("$baseHost:8080");
+        if (parsed.port != 2095) candidates.add("$baseHost:2095");
       }
+
+      for (final candidateDomain in candidates) {
+        try {
+          final link =
+              "$candidateDomain/player_api.php?username=${Uri.encodeComponent(cleanUser)}&password=${Uri.encodeComponent(cleanPass)}";
+          final Response<String> response = await _dio.get(
+            link,
+            options: Options(
+              headers: {'User-Agent': 'IPTVSmartersPlayer'},
+              receiveTimeout: const Duration(seconds: 15),
+              sendTimeout: const Duration(seconds: 15),
+            ),
+          );
+
+          if (response.statusCode == 200 && response.data != null) {
+            final body = response.data!.trim();
+            if (body.startsWith('{') && body.contains('user_info')) {
+              final Map<String, dynamic> json = jsonDecode(body);
+              final user = UserModel.fromJson(
+                  json, accountName, candidateDomain, typeLogin, 1);
+
+              await AuthLocale.logOut();
+              if (addToPlayList) {
+                await AuthLocale.deleteUser(accountName);
+                await AuthLocale.saveUser(user);
+              } else {
+                await AuthLocale.updateStatusUser(user.accountName);
+              }
+              return user;
+            }
+          }
+        } catch (innerErr) {
+          debugPrint("Candidate $candidateDomain failed: $innerErr");
+        }
+      }
+
+      showWarningToast("تعذر الاتصال بالسيرفر، تأكد من البيانات");
+      return null;
     } catch (e) {
       debugPrint("Error: $e");
       showWarningToast("Error: $e");
@@ -80,41 +115,5 @@ class AuthApi {
 
   Future<AdsServer?> getServerAds() async {
     return null;
-    /*  try {
-      Response<String> response = await _dio.get(kServerAds);
-
-      if (response.statusCode == 200) {
-        var json = jsonDecode(response.data ?? "");
-        final serverAds = AdsServer.fromJson(json);
-
-        return serverAds;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      debugPrint("Error server ads: $e");
-      return null;
-    }*/
   }
-
-// Future<String?> ignoreSSLRequests(String url) async {
-//   try {
-//     final Response<String> response = await _dio.post(
-//         "https://mouadzizi.com/applications/ignore_sll_iptv.php",
-//         data: {
-//           "url": url,
-//         });
-
-//     if (response.statusCode == 200) {
-//       debugPrint("RESULT: ${response.data}");
-//       return response.data;
-//     } else {
-//       debugPrint("Error ${response.statusCode}");
-//       return null;
-//     }
-//   } catch (e) {
-//     debugPrint("Error: $e");
-//     return null;
-//   }
-// }
 }
