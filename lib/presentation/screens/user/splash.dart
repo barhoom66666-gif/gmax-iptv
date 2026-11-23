@@ -66,11 +66,14 @@ class CardLoadingSplash extends StatelessWidget {
     return Container(
       decoration: kDecorBackground,
       child: Center(
-        child: SvgPicture.asset(
-          kIconSplashSvg,
-          width: deviceIsWeb(context) ? 180 : 120,
-          height: deviceIsWeb(context) ? 180 : 120,
-          fit: BoxFit.cover,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Image.asset(
+            kIconSplash,
+            width: deviceIsWeb(context) ? 180 : 140,
+            height: deviceIsWeb(context) ? 180 : 140,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );

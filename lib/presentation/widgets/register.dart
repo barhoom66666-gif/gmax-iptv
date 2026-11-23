@@ -69,10 +69,14 @@ class _IntroImageAnimatedState extends State<IntroImageAnimated> {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              kIconSplashSvg,
-              width: getSize(context).width * .25,
-              height: getSize(context).width * .25,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: Image.asset(
+                kIconSplash,
+                width: getSize(context).width * .22,
+                height: getSize(context).width * .22,
+                fit: BoxFit.cover,
+              ),
             ),
           ],
         ),

@@ -96,10 +96,27 @@ class CardLogoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.asset(
-      kIconSplashSvg,
-      width: 110,
-      fit: BoxFit.cover,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.asset(
+            kIconSplash,
+            width: 34,
+            height: 34,
+            fit: BoxFit.cover,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          "IA ALZAABI",
+          style: styleTitle.copyWith(
+            fontSize: 15,
+            color: const Color(0xFFFCE38A),
+          ),
+        ),
+      ],
     );
   }
 }

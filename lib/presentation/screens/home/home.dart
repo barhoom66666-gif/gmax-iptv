@@ -138,10 +138,27 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                SvgPicture.asset(
-                  kIconSplashSvg,
-                  width: 68,
-                  height: 52,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.asset(
+                        kIconSplash,
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      "IA ALZAABI",
+                      style: styleTitle.copyWith(
+                        fontSize: 18,
+                        color: const Color(0xFFFCE38A),
+                      ),
+                    ),
+                  ],
                 ),
                 Text(
                   kIsArabicLang
@@ -287,10 +304,14 @@ class _HomePageState extends State<HomePage> {
                             child: Stack(
                               alignment: Alignment.center,
                               children: [
-                                SvgPicture.asset(
-                                  kIconSplashSvg,
-                                  width: 105,
-                                  height: 85,
+                                Positioned.fill(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.asset(
+                                      kImageIntro,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
                                 ),
                                 Positioned(
                                   bottom: 8,
@@ -377,8 +398,8 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 kIsArabicLang
-                    ? "8K Gold IPTV — النسخة العربية المفعلة"
-                    : "8K Gold IPTV — Licensed Edition",
+                    ? "IA ALZAABI — النسخة العربية المفعلة"
+                    : "IA ALZAABI — Licensed Edition",
                 style: styleBody.copyWith(
                   fontSize: 11.5,
                   color: const Color(0xFFD5B055),
