@@ -101,12 +101,12 @@ class _CardM3UState extends State<CardM3U> {
     return Column(
       children: [
         CardInputLoginTile(
-          label: 'Name (optional)',
+          label: 'الاسم / Name',
           controller: _name,
         ),
         const SizedBox(height: 10),
         CardInputLoginTile(
-          label: 'Link (M3U)',
+          label: 'رابط M3U',
           controller: _m3u,
         ),
         const SizedBox(height: 20),
@@ -235,22 +235,22 @@ class _CardXTREAMState extends State<CardXTREAM> {
     return Column(
       children: [
         CardInputLoginTile(
-          label: 'Account name',
+          label: 'اسم الحساب',
           controller: _name,
         ),
         const SizedBox(height: 10),
         CardInputLoginTile(
-          label: 'Domain',
+          label: 'السيرفر Domain',
           controller: _domain,
         ),
         const SizedBox(height: 10),
         CardInputLoginTile(
-          label: 'Username',
+          label: 'المستخدم User',
           controller: _username,
         ),
         const SizedBox(height: 10),
         CardInputLoginTile(
-          label: 'Password',
+          label: 'كلمة السر Pass',
           controller: _password,
         ),
         const SizedBox(height: 20),

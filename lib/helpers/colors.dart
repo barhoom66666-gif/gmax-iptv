@@ -1,28 +1,35 @@
 part of 'helpers.dart';
 
-const Color kColorPrimary = Color(0xff006e5b);
-const Color kColorPrimaryDark = Color(0xff006e5b);
+const Color kColorPrimary = Color(0xFFD5B055);
+const Color kColorPrimaryDark = Color(0xFF9A711C);
 
-const Color kColorFocus = Color(0xff006e5b);
+const Color kColorFocus = Color(0xFFE5C158);
 
-const Color kBackgroundScaffold = Color(0xFF161514);
+const Color kBackgroundScaffold = Color(0xFF0A0D12);
 
-const Color kColorBack = Color(0xFF171A1D); //800
-const Color kColorBackDark = Color(0xFF131518); //900
+const Color kColorBack = Color(0xFF141E27); //800
+const Color kColorBackDark = Color(0xFF090C10); //900
 
-const Color kColorCardLight = Color(0xFF1D2024); //700
-const Color kColorCardDark = Color(0xFF23272B); //600
-const Color kColorCardDarkness = Color(0xFF100E15);
+const Color kColorCardLight = Color(0xFF23303A); //700
+const Color kColorCardDark = Color(0xFF1B252D); //600
+const Color kColorCardDarkness = Color(0xFF0D1217);
 
-const Color kColorHint = Color(0xFF272B30); //500
-const Color kColorHintGrey = Color(0xFF686B6E); //400
-const Color kColorFontLight = Color(0xFFE9EAEA); //100
+const Color kColorHint = Color(0xFF27343F); //500
+const Color kColorHintGrey = Color(0xFF8A949E); //400
+const Color kColorFontLight = Color(0xFFF2F4F6); //100
 
-const Color kColorOffer = Color(0xff00b294);
+const Color kColorOffer = Color(0xFFE5C158);
 
 BoxDecoration kDecorBackground = const BoxDecoration(
   gradient: LinearGradient(
-    colors: [kColorBackDark, kColorBack],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFF090C10),
+      Color(0xFF18222B),
+      Color(0xFF231B0E),
+      Color(0xFF0B0F14),
+    ],
   ),
 );
 
@@ -38,17 +45,3 @@ BoxDecoration kDecorIconCircle = const BoxDecoration(
     colors: [kColorPrimaryDark, kColorPrimary],
   ),
 );
-
-/*
-const Color kColorPrimary = Color(0xFFEF233C);
-const Color kColorPrimaryDark = Color(0xFFB31A2D);
-
-const Color kColorFocus = Color(0xFFD72036);
-
-const Color kColorBack = Color(0xFF131518);
-const Color kColorBackDark = Color(0xFF171A1D);
-
-const Color kColorCardLight = Color(0xFF272B30);
-const Color kColorCardDark = Color(0xFF1D2024);
-const Color kColorCardDarkness = Color(0xFF131518);
- */

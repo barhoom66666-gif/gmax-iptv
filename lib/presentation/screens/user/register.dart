@@ -56,8 +56,8 @@ class _RegisterPageState extends State<RegisterPage>
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'New Playlist'.toUpperCase(),
-                              style: styleTitle,
+                              'إضافة اشتراك / NEW PLAYLIST',
+                              style: styleTitle.copyWith(fontSize: 15),
                             ),
                             FilledButton(
                               onPressed: () {
@@ -65,14 +65,15 @@ class _RegisterPageState extends State<RegisterPage>
                                       "demo",
                                       "demo",
                                       "https://demo.gmax.iptv",
-                                      "GMAX Demo",
+                                      "8K Gold Demo",
                                       typeLogin: "XTREME",
                                     ));
                               },
                               child: Text(
-                                "▶ Try Demo Playlist",
+                                "▶ تشغيل باقة 8K التجريبية",
                                 style: styleBody.copyWith(
-                                  color: Colors.white,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
                                   fontSize: 11.5,
                                 ),
                               ),
@@ -87,35 +88,35 @@ class _RegisterPageState extends State<RegisterPage>
                               SizedBox(
                                 width: deviceIsWeb(context) ? 130 : 100,
                                 child: Text(
-                                  'Playlist Type',
+                                  'نوع القائمة',
                                   style: styleBody,
                                 ),
                               ),
                               Expanded(
                                 child: GFSegmentTabs(
-                                  height: 22,
+                                  height: 24,
                                   tabController: tabController,
                                   tabBarColor: theme.scaffoldBackgroundColor,
-                                  labelColor: Colors.white,
+                                  labelColor: Colors.black,
                                   unselectedLabelColor: Colors.white,
                                   borderRadius: BorderRadius.circular(5),
                                   indicator: BoxDecoration(
-                                    color: Colors.grey[130],
+                                    color: kColorPrimary,
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   border: Border.all(
-                                    color: Colors.grey[90],
-                                    width: .5,
+                                    color: kColorPrimary,
+                                    width: .6,
                                   ),
                                   length: lengthTab,
                                   indicatorPadding: EdgeInsets.zero,
                                   labelPadding: EdgeInsets.zero,
-                                  tabs: ["M3U", "XTREME", "PLAYLISTS"]
+                                  tabs: ["M3U", "XTREME", "القوائم"]
                                       .map(
                                         (text) => Text(
                                           text,
                                           style: styleBody.copyWith(
-                                            fontSize: 12,
+                                            fontSize: 11.5,
                                           ),
                                         ),
                                       )

@@ -66,7 +66,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               items: [
                 PaneItem(
                   icon: const Icon(FluentIcons.home),
-                  title: const Text('Home',
+                  title: const Text('الرئيسية / Home',
                       style: TextStyle(
                         fontFamily: kFontFamily,
                       )),
@@ -82,7 +82,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
                 PaneItem(
                   icon: const Icon(FluentIcons.my_movies_t_v),
-                  title: const Text('Movies',
+                  title: const Text('الأفلام / Movies',
                       style: TextStyle(
                         fontFamily: kFontFamily,
                       )),
@@ -98,7 +98,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
                 PaneItem(
                     icon: const Icon(FluentIcons.t_v_monitor_selected),
-                    title: const Text('Tv Shows',
+                    title: const Text('المسلسلات / Series',
                         style: TextStyle(
                           fontFamily: kFontFamily,
                         )),
@@ -112,7 +112,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     }),
                 PaneItem(
                     icon: const Icon(FluentIcons.streaming),
-                    title: const Text('Lives',
+                    title: const Text('مباشر / Live TV',
                         style: TextStyle(
                           fontFamily: kFontFamily,
                         )),
@@ -129,7 +129,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 PaneItemSeparator(color: Colors.grey),
                 PaneItem(
                     icon: const Icon(FluentIcons.settings),
-                    title: const Text('Settings',
+                    title: const Text('الإعدادات / Settings',
                         style: TextStyle(
                           fontFamily: kFontFamily,
                         )),

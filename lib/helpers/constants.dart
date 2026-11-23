@@ -1,9 +1,9 @@
 part of 'helpers.dart';
 
-const String kAppName = "GMAX IPTV";
-const String kAppNamePro = 'GMAX PRO';
+const String kAppName = "8K IPTV";
+const String kAppNamePro = '8K GOLD';
 const String kAppId = "com.gmax.iptv";
-const String kAppVersion = "1.0.0";
+const String kAppVersion = "3.8";
 
 //TODO: STATUS ADS ( true / false )
 const bool kShowAds = false;
