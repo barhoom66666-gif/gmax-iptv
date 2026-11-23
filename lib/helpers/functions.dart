@@ -58,13 +58,7 @@ Future<void> showInAppReview() async {
 
 Future<void> shareApp() async {
   await Share.share(
-    'Get ready to revolutionize your entertainment experience with '
-    'Wify IPTV! Say goodbye to buffering and slow streaming, and hello to'
-    ' endless hours of high-quality video content. From the latest movies '
-    'and TV shows to your favorite sports events, Wify IPTV has it all.'
-    ' Download the app now and start watching what you love, '
-    'wherever you are! #WifyIPTV #StreamingDoneRight #NeverMissABeat\n'
-    'https://codecanyon.net/user/azul_mouad/portfolio',
+    'Alzaabi TV — النسخة الذهبية الخاصة',
   );
 }
 

@@ -8,12 +8,12 @@ const String kAppVersion = "3.8";
 //TODO: STATUS ADS ( true / false )
 const bool kShowAds = false;
 
-///SOCIAL MEDIA ACCOUNTS
-const String kEmailSupport = "moad.devloper@gmail.com";
-const String kReviewApp = "https://codecanyon.net/user/azul_mouad/portfolio";
-const String kTwitter = "https://codecanyon.net/user/azul_mouad/portfolio";
-const String kFacebook = "https://codecanyon.net/user/azul_mouad/portfolio";
-const String kInstagram = "https://codecanyon.net/user/azul_mouad/portfolio";
+///SOCIAL MEDIA ACCOUNTS (Removed original developer links)
+const String kEmailSupport = "";
+const String kReviewApp = "";
+const String kTwitter = "";
+const String kFacebook = "";
+const String kInstagram = "";
 
 ///
 ///

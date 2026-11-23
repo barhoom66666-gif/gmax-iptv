@@ -64,10 +64,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                 const SizedBox(width: 10),*/
                                 CardSettingInfo(
                                   icon: FluentIcons.settings_sync,
-                                  title: "App version",
+                                  title: "إصدار التطبيق / Version",
                                   label: kAppVersion,
-                                  color: Colors.blue,
-                                  body: "Keep your app always up to date",
+                                  color: kColorPrimary,
+                                  body: "Alzaabi TV — النسخة الذهبية الخاصة",
                                   onTap: () {},
                                 ),
                               ],
@@ -129,7 +129,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               horizontal: 10,
                             ),
                             child: Text(
-                              'Preferences',
+                              'الاشتراكات / Playlists',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: deviceIsWeb(context) ? 11 : 12,
@@ -137,26 +137,12 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                           ),
                           SettingTileButton(
-                            color: Colors.green.lightest,
-                            label: "Playlist",
+                            color: kColorPrimary,
+                            label: "قائمة التشغيل النشطة",
                             icon: FluentIcons.cloud_download,
                             isSelected: true,
                             onTap: () {},
                           ),
-                          /*  SettingTileButton(
-                            color: Colors.purple.lightest,
-                            label: "EPG",
-                            icon: FluentIcons.context_menu,
-                            isSelected: false,
-                            onTap: () {},
-                          ),
-                          SettingTileButton(
-                            color: Colors.magenta.light,
-                            label: "Video Player",
-                            icon: FontAwesomeIcons.circlePlay,
-                            isSelected: false,
-                            onTap: () {},
-                          ),*/
 
                           ///Playlist actions
                           Padding(
@@ -165,7 +151,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               horizontal: 10,
                             ),
                             child: Text(
-                              'Playlist actions',
+                              'تحديث المحتوى / Actions',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: deviceIsWeb(context) ? 11 : 12,
@@ -182,7 +168,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
                               return SettingTileButton(
                                 color: Colors.teal.light,
-                                label: "Reload Movies",
+                                label: "تحديث الأفلام / Reload Movies",
                                 icon: FluentIcons.cloud_download,
                                 isSelected: isLoading,
                                 isLoading: isLoading,
@@ -190,7 +176,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 onTap: () async {
                                   await showDialogUpdateData(
                                     context,
-                                    "Update Movies",
+                                    "تحديث الأفلام",
                                     kUpdateMovies,
                                   ).then((result) {
                                     if (result == "true") {
@@ -211,7 +197,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   isLoading ? state.progress ?? 0 : 0;
                               return SettingTileButton(
                                 color: Colors.yellow.darkest,
-                                label: "Reload Tv Shows",
+                                label: "تحديث المسلسلات / Reload Series",
                                 icon: FluentIcons.cloud_download,
                                 isSelected: isLoading,
                                 isLoading: isLoading,
@@ -219,7 +205,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 onTap: () async {
                                   await showDialogUpdateData(
                                     context,
-                                    "Update Tv Shows",
+                                    "تحديث المسلسلات",
                                     kUpdateSeries,
                                   ).then((result) {
                                     if (result == "true") {
@@ -241,7 +227,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   isLoading ? state.progress ?? 0 : 0;
                               return SettingTileButton(
                                 color: Colors.purple.light,
-                                label: "Reload Live",
+                                label: "تحديث البث المباشر / Reload Live",
                                 icon: FluentIcons.cloud_download,
                                 isSelected: isLoading,
                                 isLoading: isLoading,
@@ -249,7 +235,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 onTap: () async {
                                   await showDialogUpdateData(
                                     context,
-                                    "Update Live",
+                                    "تحديث البث المباشر",
                                     kUpdateLive,
                                   ).then((result) {
                                     if (result == "true") {
@@ -259,73 +245,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                   });
                                 },
                               );
-                            },
-                          ),
-                          /* SettingTileButton(
-                            color: Colors.yellow.darkest,
-                            label: "Hide categories",
-                            icon: FluentIcons.collapse_menu,
-                            isSelected: false,
-                            onTap: () {},
-                          ),*/
-
-                          ///Reach us
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 5,
-                              horizontal: 10,
-                            ),
-                            child: Text(
-                              'Reach us',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: deviceIsWeb(context) ? 11 : 12,
-                              ),
-                            ),
-                          ),
-                          SettingTileButton(
-                            color: Colors.red.lightest,
-                            label: "Contact us",
-                            icon: FontAwesomeIcons.envelope,
-                            isSelected: false,
-                            onTap: () async {
-                              await launchUrlString("mailto:$kEmailSupport");
-                            },
-                          ),
-                          SettingTileButton(
-                            color: Colors.orange.lighter,
-                            label: "Review the app",
-                            icon: FontAwesomeIcons.star,
-                            isSelected: false,
-                            onTap: () async {
-                              await launchUrlString(kReviewApp);
-                            },
-                          ),
-                          SettingTileButton(
-                            color: Colors.blue.light,
-                            label: "Follow us on Twitter",
-                            icon: FontAwesomeIcons.twitter,
-                            isSelected: false,
-                            onTap: () async {
-                              await launchUrlString(kTwitter);
-                            },
-                          ),
-                          SettingTileButton(
-                            color: Colors.purple.dark,
-                            label: "Follow us on Instagram",
-                            icon: FontAwesomeIcons.instagram,
-                            isSelected: false,
-                            onTap: () async {
-                              await launchUrlString(kInstagram);
-                            },
-                          ),
-                          SettingTileButton(
-                            color: Colors.blue.darker,
-                            label: "Follow us on Facebook",
-                            icon: FontAwesomeIcons.facebookF,
-                            isSelected: false,
-                            onTap: () async {
-                              await launchUrlString(kFacebook);
                             },
                           ),
                         ],
