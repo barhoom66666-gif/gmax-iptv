@@ -1703,10 +1703,7 @@
       renderSubPageContent();
     }
 
-    function selectCategory(catId) {
-      state.selectedCategory = catId;
-      renderSubPageContent();
-    }
+
 
     function renderSubPageContent() {
       const box = document.getElementById("subpage-content");
@@ -1854,22 +1851,100 @@
       }
     }
 
+    function isArPriority(name) {
+      const u = (name || "").toUpperCase();
+      return u.includes("AR|") || u.includes("AR ") || u.includes("ARAB") || u.includes("BEIN") || u.includes("OSN") || u.includes("MBC") || u.includes("SHAHID") || u.includes("STARZ") || u.includes("WATCH IT") || name.includes("عرب") || name.includes("شاهد") || name.includes("مسلسلات") || name.includes("أفلام") || name.includes("افلام");
+    }
+    function sortArFirst(list) {
+      if (!Array.isArray(list)) return [];
+      const pri = [], rest = [];
+      for (const c of list) {
+        if (isArPriority(c.category_name || "")) pri.push(c);
+        else rest.push(c);
+      }
+      return [...pri, ...rest];
+    }
     async function handleLoginXtream() {
-      const name = document.getElementById("xt-name").value.trim() || "اشتراك Xtream";
+      const name = document.getElementById("xt-name").value.trim() || "Alzaabi 8K VIP";
       const domain = document.getElementById("xt-domain").value.trim().replace(/\/+$/, "");
       const user = document.getElementById("xt-user").value.trim();
       const pass = document.getElementById("xt-pass").value.trim();
       if (!domain || !user || !pass) return showToast("يرجى إدخال رابط السيرفر واسم المستخدم وكلمة المرور");
-      showToast("جارٍ الاتصال بسيرفر Xtream...");
+      showToast("جارٍ الاتصال بسيرفر Xtream وتحميل الباقات...");
       try {
-        const res = await fetch(`/api/xtream?domain=${encodeURIComponent(domain)}&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`);
+        const qBase = `/api/xtream?domain=${encodeURIComponent(domain)}&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`;
+        const res = await fetch(qBase);
         const json = await res.json();
-        if (!json || !json.user_info) return showToast("بيانات اشتراك Xtream غير صحيحة");
-        showToast("تم تسجيل الدخول بنجاح!");
+        if (!json || !json.user_info) return showToast("تعذر الاتصال بالسيرفر (تأكد من تشغيل VPN إذا كان السيرفر محجوباً)");
+        const [lCats, mCats, sCats] = await Promise.all([
+          fetch(qBase + "&action=get_live_categories").then(r => r.json()).catch(() => []),
+          fetch(qBase + "&action=get_vod_categories").then(r => r.json()).catch(() => []),
+          fetch(qBase + "&action=get_series_categories").then(r => r.json()).catch(() => []),
+        ]);
+        const newPl = {
+          accountName: name,
+          typeLogin: "XTREME",
+          isLiveXtream: true,
+          domain,
+          username: user,
+          password: pass,
+          expDate: "Active",
+          liveCategories: sortArFirst(lCats),
+          liveChannels: [],
+          movieCategories: sortArFirst(mCats),
+          movies: [],
+          seriesCategories: sortArFirst(sCats),
+          series: []
+        };
+        state.activePlaylist = newPl;
+        state.savedPlaylists.unshift(newPl);
+        applyLanguage();
+        showToast("تم تفعيل اشتراك " + name + " بنجاح!");
         backToDashboard();
       } catch (e) {
-        showToast("خطأ في الاتصال بالسيرفر");
+        showToast("لتشغيل سيرفر World 8K مباشرة على الآيباد افتح الرابط المحلي أو فعّل VPN");
       }
+    }
+    async function selectCategory(catId) {
+      state.selectedCategory = catId;
+      const pl = state.activePlaylist;
+      if (pl && pl.isLiveXtream && catId !== "ALL") {
+        const qBase = `/api/xtream?domain=${encodeURIComponent(pl.domain)}&username=${encodeURIComponent(pl.username)}&password=${encodeURIComponent(pl.password)}`;
+        showToast("جارٍ تحميل محتوى الباقة...");
+        try {
+          if (state.subMode === "live" || state.subMode === "sports") {
+            const list = await fetch(qBase + `&action=get_live_streams&category_id=${encodeURIComponent(catId)}`).then(r => r.json());
+            pl.liveChannels = (Array.isArray(list) ? list : []).map(ch => ({
+              stream_id: String(ch.stream_id),
+              name: ch.name || "Channel",
+              category_id: String(catId),
+              stream_icon: ch.stream_icon || "",
+              stream_url: `/api/stream?url=${encodeURIComponent(pl.domain + '/live/' + pl.username + '/' + pl.password + '/' + ch.stream_id + '.m3u8')}`
+            }));
+          } else if (state.subMode === "movies") {
+            const list = await fetch(qBase + `&action=get_vod_streams&category_id=${encodeURIComponent(catId)}`).then(r => r.json());
+            pl.movies = (Array.isArray(list) ? list : []).map(m => ({
+              stream_id: String(m.stream_id),
+              name: m.name || "Movie",
+              category_id: String(catId),
+              rating: m.rating || "8.5",
+              stream_icon: m.stream_icon || "",
+              stream_url: `/api/stream?url=${encodeURIComponent(pl.domain + '/movie/' + pl.username + '/' + pl.password + '/' + m.stream_id + '.' + (m.container_extension || 'mp4'))}`
+            }));
+          } else if (state.subMode === "series") {
+            const list = await fetch(qBase + `&action=get_series&category_id=${encodeURIComponent(catId)}`).then(r => r.json());
+            pl.series = (Array.isArray(list) ? list : []).map(s => ({
+              series_id: String(s.series_id),
+              name: s.name || "Series",
+              category_id: String(catId),
+              rating: s.rating || "9.0",
+              cover: s.cover || "",
+              episodes: []
+            }));
+          }
+        } catch (err) {}
+      }
+      renderSubPageContent();
     }
 
     function playMedia(id, type) {
