@@ -9,9 +9,20 @@ class CategoriesCubit extends Cubit<CategoriesState> {
   CategoriesCubit() : super(CategoriesState(const [], const [], const []));
 
   initialCategories() async {
-    final lives = await ChannelsLocale.getChannels("lives");
-    final movies = await ChannelsLocale.getChannels("movies");
-    final series = await ChannelsLocale.getChannels("series");
+    var lives = await ChannelsLocale.getChannels("lives");
+    var movies = await ChannelsLocale.getChannels("movies");
+    var series = await ChannelsLocale.getChannels("series");
+
+    if (lives.isEmpty && movies.isEmpty && series.isEmpty) {
+      final api = IpTvApi();
+      lives = await api.getCategories("get_live_categories");
+      if (lives.isNotEmpty) await ChannelsLocale.saveChannels(lives, "lives");
+      movies = await api.getCategories("get_vod_categories");
+      if (movies.isNotEmpty) await ChannelsLocale.saveChannels(movies, "movies");
+      series = await api.getCategories("get_series_categories");
+      if (series.isNotEmpty) await ChannelsLocale.saveChannels(series, "series");
+    }
+
     emit(CategoriesState(lives, movies, series));
   }
 }

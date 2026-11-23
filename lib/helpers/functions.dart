@@ -131,12 +131,12 @@ Future<void> goFullScreen(bool value) async {
 
 ///SQL
 String? sanitizeString(dynamic value) {
-  if (value != null ||
-      value.toString().isNotEmpty && value.toString().toLowerCase() != 'null') {
-    return "$value".toString();
-  } else {
+  if (value == null) return null;
+  final s = value.toString().trim();
+  if (s.isEmpty || s.toLowerCase() == 'null') {
     return null;
   }
+  return s;
 }
 
 bool isValidUrl(String url) {

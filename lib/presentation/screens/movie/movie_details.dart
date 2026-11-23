@@ -35,8 +35,21 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CardDetailsLoading();
-            } else if (snapshot.hasData) {
+            } else {
               final movieDetail = snapshot.data;
+              final ext = movieDetail?.movieData?.containerExtension ??
+                  widget.channelMovie.containerExtension ??
+                  "mp4";
+              final plotText = movieDetail?.info?.plot ??
+                  widget.channelMovie.plot ??
+                  "";
+              final releaseText = movieDetail?.info?.releasedate ??
+                  widget.channelMovie.releaseDate ??
+                  "";
+              final durationText = getDurationMovie(movieDetail?.info?.duration);
+              final trailerId = movieDetail?.info?.youtubeTrailer ??
+                  widget.channelMovie.youtubeTrailer ??
+                  "";
 
               return Positioned(
                 bottom: 0,
@@ -49,12 +62,16 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                       padding: const EdgeInsets.all(10.0),
                       child: Row(
                         children: [
-                          Text(
-                            widget.channelMovie.name ?? "",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Text(
+                              widget.channelMovie.name ?? "",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 5),
@@ -108,7 +125,6 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                         filter: ImageFilter.blur(sigmaX: 4, sigmaY: 3),
                         child: Container(
                           width: getSize(context).width,
-                          //  height: getSize(context).height * .18,
                           padding: const EdgeInsets.only(top: 15),
                           child: Column(
                             children: [
@@ -135,7 +151,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                                                 final hasDirect = (widget.channelMovie.directSource ?? "").startsWith("http");
                                                 final link = hasDirect
                                                     ? widget.channelMovie.directSource!
-                                                    : "${userAuth!.domain}/movie/${userAuth.userInfo!.username}/${userAuth.userInfo!.password}/${widget.channelMovie.streamId}.${movieDetail!.movieData!.containerExtension}";
+                                                    : "${userAuth!.domain}/movie/${userAuth.userInfo!.username}/${userAuth.userInfo!.password}/${widget.channelMovie.streamId}.$ext";
                                                 router.pushNamed(
                                                   playerVideo,
                                                   extra: VideoModel(
@@ -152,34 +168,18 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                                                     isFullScreen: true,
                                                   ),
                                                 );
-                                                /* router.pushNamed(
-                                                      screenPlayerWeb,
-                                                      extra: VideoModel(
-                                                        url: link,
-                                                        title: channelMovie.name ?? "",
-                                                        isFullScreen: true,
-                                                      ),
-                                                    );*/
                                               },
                                             );
                                           },
                                         ),
                                       ),
                                       const SizedBox(height: 10),
-                                      if (movieDetail!.info != null &&
-                                          movieDetail.info!.youtubeTrailer !=
-                                              null &&
-                                          movieDetail.info!.youtubeTrailer
-                                              .toString()
-                                              .isNotEmpty)
+                                      if (trailerId.toString().isNotEmpty)
                                         CardButtonTrailer(
                                           onTap: () {
-                                            //  open trailer
                                             context.pushNamed(
                                               screenYoutube,
-                                              extra: movieDetail
-                                                  .info!.youtubeTrailer
-                                                  .toString(),
+                                              extra: trailerId.toString(),
                                             );
                                           },
                                         ),
@@ -195,7 +195,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                                           constraints: const BoxConstraints(
                                               maxHeight: 120),
                                           child: Text(
-                                            movieDetail.info!.plot ?? "",
+                                            plotText,
                                             style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 12,
@@ -207,7 +207,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                                         Row(
                                           children: [
                                             Text(
-                                              "${widget.channelName} - ${movieDetail.info!.releasedate} - ${getDurationMovie(movieDetail.info!.duration)} - ",
+                                              "${widget.channelName} - $releaseText - $durationText - ",
                                               style: TextStyle(
                                                 color: Colors.grey[40],
                                                 fontSize: 11,
@@ -216,10 +216,10 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                                             ),
                                             const SizedBox(width: 10),
                                             GFRating(
-                                              value: double.parse(widget
+                                              value: double.tryParse(widget
                                                       .channelMovie
                                                       .rating5based ??
-                                                  "0"),
+                                                  "0") ?? 0.0,
                                               size: 11,
                                               color: Colors.white,
                                               borderColor: Colors.grey[60],
@@ -246,8 +246,6 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                 ),
               );
             }
-
-            return const SizedBox();
           },
         ),
 

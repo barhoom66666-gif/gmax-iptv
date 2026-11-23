@@ -100,7 +100,7 @@ class CardRandomMovie extends StatelessWidget {
                               ),
                             ),
                             GFRating(
-                              value: double.parse(movie.rating5based ?? "0"),
+                              value: double.tryParse(movie.rating5based ?? "0") ?? 0.0,
                               size: 11,
                               color: Colors.white,
                               borderColor: Colors.grey[60],

@@ -35,10 +35,12 @@ final _sqlDb = SqlDb();
 final _dio = Dio();
 
 final _options = Options(
-  followRedirects: false,
+  headers: const {'User-Agent': 'IPTVSmartersPlayer'},
+  followRedirects: true,
   validateStatus: (status) {
-    return status! < 500;
+    return status != null && status < 500;
   },
   receiveDataWhenStatusError: true,
-  sendTimeout: const Duration(seconds: 30),
+  receiveTimeout: const Duration(seconds: 25),
+  sendTimeout: const Duration(seconds: 25),
 );

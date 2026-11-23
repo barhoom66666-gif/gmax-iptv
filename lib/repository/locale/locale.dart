@@ -1,6 +1,18 @@
 part of '../api/api.dart';
 
 class AuthLocale {
+  static String _normalizeDomain(String rawDomain) {
+    final clean = rawDomain.trim().replaceAll(RegExp(r'/+$'), '');
+    if (clean == "https://demo.gmax.iptv" || clean.isEmpty) return clean;
+    try {
+      final uri = Uri.parse(clean);
+      if (uri.scheme == 'http' && (!uri.hasPort || uri.port == 80)) {
+        return "${uri.scheme}://${uri.host}:8080";
+      }
+    } catch (_) {}
+    return clean;
+  }
+
   static Future<bool> saveUser(UserModel user) async {
     try {
       await _sqlDb.insertMapData(
@@ -32,7 +44,7 @@ class AuthLocale {
         return UserModel.fromJson(
           user,
           user['account_name'],
-          user['domain'],
+          _normalizeDomain(user['domain']?.toString() ?? ''),
           user['type_login'],
           user['active'],
         );
@@ -58,7 +70,7 @@ class AuthLocale {
           .map((user) => UserModel.fromJson(
                 user,
                 user['account_name'],
-                user['domain'],
+                _normalizeDomain(user['domain']?.toString() ?? ''),
                 user['type_login'],
                 user['active'],
               ))

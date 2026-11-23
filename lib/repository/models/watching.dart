@@ -19,9 +19,9 @@ class WatchingModel {
     return WatchingModel(
       image: json["image"],
       title: json["title"],
-      sliderValue: double.parse(json["sliderValue"].toString()),
+      sliderValue: double.tryParse(json["sliderValue"].toString()) ?? 0.0,
       stream: json["stream"],
-      totalDuration: double.parse(json['durationStrm'].toString()),
+      totalDuration: double.tryParse(json['durationStrm'].toString()) ?? 0.0,
       streamId: json['streamId'],
     );
   }

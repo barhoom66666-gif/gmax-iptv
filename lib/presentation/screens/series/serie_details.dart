@@ -42,7 +42,7 @@ class _SerieDetailsPageState extends State<SerieDetailsPage> {
               final serieDetail = snapshot.data;
 
               List<String> listKeysEpisodes =
-                  serieDetail!.episodes!.keys.toList();
+                  (serieDetail?.episodes ?? {}).keys.toList();
               List<Season> seasons = listKeysEpisodes
                   .map((e) => Season(
                         id: e,
@@ -160,13 +160,13 @@ class _SerieDetailsPageState extends State<SerieDetailsPage> {
                                                 i < seasons.length;
                                                 i++)
                                               ComboBoxItem(
-                                                value: "${i + 1}",
-                                                child: Text("Season ${i + 1}"),
+                                                value: seasons[i].id ?? "${i + 1}",
+                                                child: Text("Season ${seasons[i].id ?? (i + 1)}"),
                                               )
                                           ],
                                           onChanged: (season) {
                                             if (season != null &&
-                                                serieDetail.episodes != null) {
+                                                serieDetail?.episodes != null) {
                                               router.pushNamed(
                                                 screenSerieSeasons,
                                                 queryParameters: {
@@ -175,7 +175,7 @@ class _SerieDetailsPageState extends State<SerieDetailsPage> {
                                                       .channelSerie.cover
                                                       .toString(),
                                                 },
-                                                extra: serieDetail
+                                                extra: serieDetail!
                                                     .episodes![season],
                                               );
                                             } else {
@@ -185,8 +185,8 @@ class _SerieDetailsPageState extends State<SerieDetailsPage> {
                                         ),
                                       ),
                                       const SizedBox(height: 10),
-                                      if (serieDetail.info != null &&
-                                          serieDetail.info!.youtubeTrailer !=
+                                      if (serieDetail?.info != null &&
+                                          serieDetail!.info!.youtubeTrailer !=
                                               null &&
                                           serieDetail.info!.youtubeTrailer
                                               .toString()
@@ -214,7 +214,7 @@ class _SerieDetailsPageState extends State<SerieDetailsPage> {
                                               maxHeight: 120),
                                           child: SingleChildScrollView(
                                             child: Text(
-                                              serieDetail.info!.plot ?? "",
+                                              serieDetail?.info?.plot ?? widget.channelSerie.plot ?? "",
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 12,
@@ -227,7 +227,7 @@ class _SerieDetailsPageState extends State<SerieDetailsPage> {
                                         Row(
                                           children: [
                                             Text(
-                                              "${widget.catyName} - ${widget.channelSerie.releaseDate ?? ""} - ${serieDetail.seasons!.length} Seasons - ",
+                                              "${widget.catyName} - ${widget.channelSerie.releaseDate ?? ""} - ${seasons.length} Seasons - ",
                                               style: TextStyle(
                                                 color: Colors.grey[40],
                                                 fontSize: 11,
@@ -236,10 +236,10 @@ class _SerieDetailsPageState extends State<SerieDetailsPage> {
                                             ),
                                             const SizedBox(width: 10),
                                             GFRating(
-                                              value: double.parse(widget
+                                              value: double.tryParse(widget
                                                       .channelSerie
                                                       .rating5based ??
-                                                  "0"),
+                                                  "0") ?? 0.0,
                                               size: 11,
                                               color: Colors.white,
                                               borderColor: Colors.grey[60],

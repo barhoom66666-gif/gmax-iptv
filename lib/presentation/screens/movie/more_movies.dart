@@ -43,8 +43,9 @@ class MoreMoviesPage extends StatelessWidget {
                                   child: CardMovieItem(
                                     name: list[i].name ?? "",
                                     image: list[i].streamIcon ?? "",
-                                    rate: double.parse(
-                                        list[i].rating5based ?? "0"),
+                                    rate: double.tryParse(
+                                            list[i].rating5based ?? "0") ??
+                                        0.0,
                                     onTap: () {
                                       router.pushNamed(
                                         screenMoviesDetails,

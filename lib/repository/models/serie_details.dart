@@ -10,24 +10,28 @@ class SerieDetails {
   });
 
   SerieDetails.fromJson(Map<String, dynamic> json)
-      : seasons = json['seasons'] == null
-            ? []
-            : (json['seasons'] as List?)
-                ?.map((e) => Season.fromJson(e as Map<String, dynamic>))
-                .toList(),
-        info = (json['info'] as Map<String, dynamic>?) != null
+      : seasons = json['seasons'] is List
+            ? (json['seasons'] as List)
+                .whereType<Map<String, dynamic>>()
+                .map((e) => Season.fromJson(e))
+                .toList()
+            : [],
+        info = json['info'] is Map<String, dynamic>
             ? InfoSerie.fromJson(json['info'] as Map<String, dynamic>)
             : null,
-        episodes = (json['episodes'] as Map<String, dynamic>).map(
-          (key, value) {
-            return MapEntry(
-                key,
-                (value as List<dynamic>)
-                    .map((dynamic e) =>
-                        Episode.fromJson(e as Map<String, dynamic>))
-                    .toList());
-          },
-        );
+        episodes = json['episodes'] is Map<String, dynamic>
+            ? (json['episodes'] as Map<String, dynamic>).map(
+                (key, value) {
+                  final list = value is List
+                      ? value
+                          .whereType<Map<String, dynamic>>()
+                          .map((e) => Episode.fromJson(e))
+                          .toList()
+                      : <Episode>[];
+                  return MapEntry(key, list);
+                },
+              )
+            : {};
 
   Map<String, dynamic> toJson() => {
         'seasons': seasons,

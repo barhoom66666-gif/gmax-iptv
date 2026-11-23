@@ -46,8 +46,9 @@ class MoreSeriesPage extends StatelessWidget {
                                   child: CardMovieItem(
                                     name: finalList[i].name ?? "",
                                     image: finalList[i].cover ?? "",
-                                    rate: double.parse(
-                                        finalList[i].rating5based ?? "0"),
+                                    rate: double.tryParse(
+                                            finalList[i].rating5based ?? "0") ??
+                                        0.0,
                                     onTap: () {
                                       router.pushNamed(
                                         screenSerieDetails,

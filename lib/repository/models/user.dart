@@ -36,9 +36,21 @@ class UserModel {
                 : json['server_info']) as Map<String, dynamic>)
             : null,
         accountName = json['account_name'] ?? accName,
-        domain = sanitizeString(json['domain']) ?? url,
+        domain = _fixPort80Domain(sanitizeString(json['domain']) ?? url),
         typeLogin = sanitizeString(json['type_login']) ?? typeLogin,
         active = json['active'] ?? active;
+
+  static String _fixPort80Domain(String raw) {
+    final clean = raw.trim().replaceAll(RegExp(r'/+$'), '');
+    if (clean == "https://demo.gmax.iptv" || clean.isEmpty) return clean;
+    try {
+      final uri = Uri.parse(clean);
+      if (uri.scheme == 'http' && (!uri.hasPort || uri.port == 80)) {
+        return "${uri.scheme}://${uri.host}:8080";
+      }
+    } catch (_) {}
+    return clean;
+  }
 
   Map<String, dynamic> toJson() => {
         'user_info': jsonEncode(userInfo?.toJson()),

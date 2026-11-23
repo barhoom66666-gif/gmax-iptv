@@ -245,7 +245,7 @@ class CardEpisode extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(5),
                   child: CachedNetworkImage(
-                    imageUrl: model!.info!.movieImage ?? "",
+                    imageUrl: model?.info?.movieImage ?? "",
                     width: getSize(context).width,
                     height: deviceIsWeb(context) ? 130 : 100,
                     fit: BoxFit.cover,
