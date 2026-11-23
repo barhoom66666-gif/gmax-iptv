@@ -373,6 +373,58 @@ class IpTvApi {
         return null;
       }
 
+      if (user.domain == "https://demo.gmax.iptv") {
+        return SerieDetails.fromJson({
+          "seasons": [
+            {
+              "air_date": "2025-01-01",
+              "episode_count": "2",
+              "id": "1",
+              "name": "Season 1",
+              "overview": "First Season",
+              "season_number": "1",
+              "cover": "https://m.media-amazon.com/images/M/MV5BMTg0NjEwNjUxM15BMl5BanBnXkFtZTcwMzk0MjQ5Mg@@._V1_.jpg",
+              "cover_big": "https://m.media-amazon.com/images/M/MV5BMTg0NjEwNjUxM15BMl5BanBnXkFtZTcwMzk0MjQ5Mg@@._V1_.jpg"
+            }
+          ],
+          "info": {
+            "name": "Cyber Chronicles S01",
+            "cover": "https://m.media-amazon.com/images/M/MV5BMTg0NjEwNjUxM15BMl5BanBnXkFtZTcwMzk0MjQ5Mg@@._V1_.jpg",
+            "plot": "Sci-Fi Adventure Series in GMAX IPTV.",
+            "cast": "GMAX Cast",
+            "director": "Blender Open Project",
+            "genre": "Sci-Fi",
+            "releaseDate": "2025-01-01",
+            "rating": "9.0",
+            "rating_5based": "4.5",
+            "backdrop_path": [],
+            "youtube_trailer": "",
+            "episode_run_time": "15",
+            "category_id": "20"
+          },
+          "episodes": {
+            "1": [
+              {
+                "id": "501",
+                "episode_num": "1",
+                "title": "Episode 1 — Awakening",
+                "container_extension": "mp4",
+                "season": "1",
+                "direct_source": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8"
+              },
+              {
+                "id": "502",
+                "episode_num": "2",
+                "title": "Episode 2 — Dragon Flight",
+                "container_extension": "mp4",
+                "season": "1",
+                "direct_source": "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
+              }
+            ]
+          }
+        });
+      }
+
       var url = "${user.domain}/player_api.php";
 
       Response<String> response = await _dio.get(

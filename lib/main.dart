@@ -35,11 +35,14 @@ import 'logic/cubits/theme/theme_cubit.dart';
 import 'logic/cubits/watch/watching_cubit.dart';
 
 void main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  MediaKit.ensureInitialized();
-  sqfliteFfiInit();
-  if (!UniversalPlatform.isDesktop) {
-    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    MediaKit.ensureInitialized();
+  } catch (e) {
+    debugPrint("MediaKit init error: $e");
+  }
+  if (UniversalPlatform.isWindows || UniversalPlatform.isLinux) {
+    sqfliteFfiInit();
   }
 
   try {

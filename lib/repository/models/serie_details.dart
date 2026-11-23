@@ -123,12 +123,11 @@ class InfoSerie {
         lastModified = json['last_modified']?.toString(),
         rating = json['rating']?.toString(),
         rating5based = json['rating_5based']?.toString(),
-        backdropPath = json['backdrop_path'] == null ||
-                json['backdrop_path'].runtimeType == String
-            ? []
-            : (json['backdrop_path'] as List)
+        backdropPath = json['backdrop_path'] is List
+            ? (json['backdrop_path'] as List)
                 .map((dynamic e) => e.toString())
-                .toList(),
+                .toList()
+            : [],
         youtubeTrailer = json['youtube_trailer']?.toString(),
         episodeRunTime = json['episode_run_time']?.toString(),
         categoryId = json['category_id']?.toString();
@@ -179,11 +178,9 @@ class Episode {
         episodeNum = json['episode_num']?.toString(),
         title = json['title']?.toString(),
         containerExtension = json['container_extension']?.toString(),
-        info = json['info'] != null && json['info'].runtimeType == List
-            ? null
-            : (json['info'] as Map<String, dynamic>?) != null
-                ? InfoEpisode.fromJson(json['info'] as Map<String, dynamic>)
-                : null,
+        info = json['info'] is Map<String, dynamic>
+            ? InfoEpisode.fromJson(json['info'] as Map<String, dynamic>)
+            : null,
         customSid = json['custom_sid']?.toString(),
         added = json['added']?.toString(),
         season = json['season']?.toString(),

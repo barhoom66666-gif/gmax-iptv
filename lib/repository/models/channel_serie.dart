@@ -68,9 +68,11 @@ class ChannelSerie {
         rating5based = sanitizeString(json['rating_5based']),
         backdropPath = json['backdrop_path'] == null
             ? null
-            : (json['backdrop_path'].runtimeType == List
+            : (json['backdrop_path'] is List
                     ? json['backdrop_path'] as List?
-                    : jsonDecode(json['backdrop_path']) as List?)
+                    : (json['backdrop_path'] is String
+                        ? jsonDecode(json['backdrop_path']) as List?
+                        : []))
                 ?.map((dynamic e) => sanitizeString(e))
                 .toList(),
         youtubeTrailer = sanitizeString(json['youtube_trailer']),
@@ -78,9 +80,11 @@ class ChannelSerie {
         categoryId = sanitizeString(json['category_id']),
         categoryIds = json['category_ids'] == null
             ? null
-            : (json['category_ids'].runtimeType == List
+            : (json['category_ids'] is List
                     ? json['category_ids'] as List?
-                    : jsonDecode(json['category_ids']) as List?)
+                    : (json['category_ids'] is String
+                        ? jsonDecode(json['category_ids']) as List?
+                        : []))
                 ?.map((dynamic e) => sanitizeString(e))
                 .toList();
 

@@ -66,20 +66,16 @@ class Info {
         rating = json['rating']?.toString(),
         director = json['director']?.toString(),
         releasedate = json['releasedate']?.toString(),
-        backdropPath = json['backdrop_path'] == null
-            ? null
-            : json['backdrop_path'] == null
-                ? []
-                : (json['backdrop_path'] as List?)
-                    ?.map((dynamic e) => e.toString())
-                    .toList(),
+        backdropPath = json['backdrop_path'] is List
+            ? (json['backdrop_path'] as List)
+                .map((dynamic e) => e.toString())
+                .toList()
+            : [],
         durationSecs = json['duration_secs']?.toString(),
         duration = json['duration']?.toString(),
-        video = json['video'].runtimeType == List
-            ? null
-            : (json['video'] as Map<String, dynamic>?) != null
-                ? Video.fromJson(json['video'] as Map<String, dynamic>)
-                : null,
+        video = json['video'] is Map<String, dynamic>
+            ? Video.fromJson(json['video'] as Map<String, dynamic>)
+            : null,
         bitrate = json['bitrate'].toString();
 
   Map<String, dynamic> toJson() => {

@@ -29,8 +29,9 @@ class _SeasonPageState extends State<SeasonPage> {
       final userAuth = state.user;
 
       final videos = widget.episodes
-          .map((e) => Media(
-              "${userAuth.domain}/series/${userAuth.userInfo!.username}/${userAuth.userInfo!.password}/${e!.id}.${e.containerExtension}"))
+          .map((e) => Media((e?.directSource ?? "").startsWith("http")
+              ? e!.directSource!
+              : "${userAuth.domain}/series/${userAuth.userInfo!.username}/${userAuth.userInfo!.password}/${e!.id}.${e.containerExtension}"))
           .toList();
 
       final playable = Playlist(

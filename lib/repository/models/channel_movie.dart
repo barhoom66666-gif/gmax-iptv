@@ -75,9 +75,11 @@ class ChannelMovie {
         categoryId = sanitizeString(json['category_id']),
         categoryIds = json['category_ids'] == null
             ? null
-            : (json['category_ids'].runtimeType == List
+            : (json['category_ids'] is List
                     ? json['category_ids'] as List?
-                    : jsonDecode(json['category_ids']) as List?)
+                    : (json['category_ids'] is String
+                        ? jsonDecode(json['category_ids']) as List?
+                        : []))
                 ?.map((dynamic e) => sanitizeString("$e"))
                 .toList(),
         containerExtension = sanitizeString(json['container_extension']),

@@ -26,13 +26,12 @@ class UserModel {
     String typeLogin,
     int active,
   )   : userInfo = json['user_info'] != null
-            ? UserInfo.fromJson(((json['user_info'].runtimeType == String
+            ? UserInfo.fromJson((json['user_info'] is String
                     ? jsonDecode(json['user_info'])
-                    : json['user_info']) as Map<String, dynamic>?)
-                as Map<String, dynamic>)
+                    : json['user_info']) as Map<String, dynamic>)
             : null,
         serverInfo = json['server_info'] != null
-            ? ServerInfo.fromJson((json['server_info'].runtimeType == String
+            ? ServerInfo.fromJson((json['server_info'] is String
                 ? jsonDecode(json['server_info'])
                 : json['server_info']) as Map<String, dynamic>)
             : null,
@@ -89,10 +88,13 @@ class UserInfo {
         activeCons = sanitizeString(json['active_cons']),
         createdAt = sanitizeString(json['created_at']),
         maxConnections = sanitizeString(json['max_connections']),
-        allowedOutputFormats =
-            (json['allowed_output_formats'].runtimeType == List
+        allowedOutputFormats = json['allowed_output_formats'] == null
+            ? []
+            : (json['allowed_output_formats'] is List
                     ? json['allowed_output_formats'] as List?
-                    : jsonDecode(json['allowed_output_formats']) as List?)
+                    : (json['allowed_output_formats'] is String
+                        ? jsonDecode(json['allowed_output_formats']) as List?
+                        : []))
                 ?.map((dynamic e) => e.toString())
                 .toList();
 

@@ -19,7 +19,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     final isDesktop = UniversalPlatform.isDesktop;
     if (!isDesktop) {
-      FlutterNativeSplash.remove();
+      try {
+        FlutterNativeSplash.remove();
+      } catch (_) {}
     }
     context.read<SettingsCubit>().getSettingsCode();
 
