@@ -318,11 +318,11 @@ class _VipPinLockGateState extends State<VipPinLockGate> {
                 color: const Color(0x88D5B055),
                 width: 1.5,
               ),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.65),
+                  color: Color(0xA6000000),
                   blurRadius: 28,
-                  offset: const Offset(0, 10),
+                  offset: Offset(0, 10),
                 ),
               ],
             ),
