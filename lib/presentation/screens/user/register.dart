@@ -12,8 +12,8 @@ class _RegisterPageState extends State<RegisterPage>
   late material.TabController tabController;
 
   final int lengthTab = 3;
-  final GlobalKey<_CardXTREAMState> _xtreamKey = GlobalKey<_CardXTREAMState>();
-  final GlobalKey<_CardM3UState> _m3uKey = GlobalKey<_CardM3UState>();
+  final GlobalKey<CardXTREAMState> _xtreamKey = GlobalKey<CardXTREAMState>();
+  final GlobalKey<CardM3UState> _m3uKey = GlobalKey<CardM3UState>();
 
   @override
   void initState() {

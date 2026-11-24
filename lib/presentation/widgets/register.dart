@@ -92,10 +92,10 @@ class CardM3U extends StatefulWidget {
   final bool isLoading;
 
   @override
-  State<CardM3U> createState() => _CardM3UState();
+  State<CardM3U> createState() => CardM3UState();
 }
 
-class _CardM3UState extends State<CardM3U> {
+class CardM3UState extends State<CardM3U> {
   final _name = TextEditingController();
   final _m3u = TextEditingController();
 
@@ -237,10 +237,10 @@ class CardXTREAM extends StatefulWidget {
   final bool isLoading;
 
   @override
-  State<CardXTREAM> createState() => _CardXTREAMState();
+  State<CardXTREAM> createState() => CardXTREAMState();
 }
 
-class _CardXTREAMState extends State<CardXTREAM> {
+class CardXTREAMState extends State<CardXTREAM> {
   final _name = TextEditingController();
   final _username = TextEditingController();
   final _password = TextEditingController();
