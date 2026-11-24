@@ -22,20 +22,18 @@ class FavoritesCubit extends Cubit<FavoritesState> {
   }
 
   void addMovie(ChannelMovie model, {required bool isAdd}) async {
-    await favoriteLocale.addChannelToFav(model.id!, isAdd);
-
+    await favoriteLocale.saveFavoriteMovie(model, isAdd);
     emit(state.copyWith(movies: await favoriteLocale.getFavMovies()));
   }
 
   void addSerie(ChannelSerie model, {required bool isAdd}) async {
-    await favoriteLocale.addChannelToFav(model.id!, isAdd);
+    await favoriteLocale.saveFavoriteSerie(model, isAdd);
     final list = await favoriteLocale.getFavSeries();
-    debugPrint("FAV SIZE: ${list.length}");
     emit(state.copyWith(series: list));
   }
 
   void addLive(ChannelLive model, {required bool isAdd}) async {
-    await favoriteLocale.saveFavoriteLive(model.id!, isAdd);
+    await favoriteLocale.saveFavoriteLiveModel(model, isAdd);
     emit(state.copyWith(lives: await favoriteLocale.getFavLives()));
   }
 }

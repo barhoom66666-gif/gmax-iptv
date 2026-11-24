@@ -1,48 +1,87 @@
 part of '../api/api.dart';
 
 class FavoriteLocale {
-  Future<bool> addChannelToFav(String channelId, bool isLike) async {
+  Future<bool> saveFavoriteMovie(ChannelMovie movie, bool isLike) async {
     try {
-      var response = await _sqlDb.deleteData(
-          "UPDATE '$tableChannels' SET 'is_favourite' = '${isLike ? 1 : 0}' WHERE id = $channelId");
+      final user = await AuthLocale.getUser();
+      final acc = user?.accountName ?? "default";
+      final sid = movie.streamId ?? "";
 
-      debugPrint("Fav $channelId RES: $response");
+      await _sqlDb.deleteData(
+        "DELETE FROM '$tableChannels' WHERE stream_type = 'movie' AND stream_id = '$sid'",
+      );
 
+      if (isLike) {
+        final Map<String, dynamic> map = movie.toJson();
+        map['account_name'] = acc;
+        map['stream_type'] = 'movie';
+        map['is_favourite'] = 1;
+        await _sqlDb.insertMapData(tableChannels, map);
+      }
       return true;
     } catch (e) {
-      debugPrint("Error: Fav Movie: $e");
-      return true;
+      debugPrint("Error saveFavoriteMovie: $e");
+      return false;
     }
   }
 
-  Future<bool> saveFavoriteLive(String liveId, bool isLike) async {
+  Future<bool> saveFavoriteSerie(ChannelSerie serie, bool isLike) async {
     try {
-      var response = await _sqlDb.deleteData(
-          "UPDATE '$tableChannelLives' SET 'is_favourite' = '${isLike ? 1 : 0}' WHERE id = $liveId");
+      final user = await AuthLocale.getUser();
+      final acc = user?.accountName ?? "default";
+      final sid = serie.seriesId ?? "";
 
-      debugPrint("Fav $liveId RES: $response");
+      await _sqlDb.deleteData(
+        "DELETE FROM '$tableChannels' WHERE stream_type = 'serie' AND series_id = '$sid'",
+      );
 
+      if (isLike) {
+        final Map<String, dynamic> map = serie.toJson();
+        map['account_name'] = acc;
+        map['stream_type'] = 'serie';
+        map['is_favourite'] = 1;
+        await _sqlDb.insertMapData(tableChannels, map);
+      }
       return true;
     } catch (e) {
-      debugPrint("Error: Fav lives: $e");
+      debugPrint("Error saveFavoriteSerie: $e");
+      return false;
+    }
+  }
+
+  Future<bool> saveFavoriteLiveModel(ChannelLive live, bool isLike) async {
+    try {
+      final user = await AuthLocale.getUser();
+      final acc = user?.accountName ?? "default";
+      final sid = live.streamId ?? "";
+
+      await _sqlDb.deleteData(
+        "DELETE FROM '$tableChannelLives' WHERE stream_id = '$sid'",
+      );
+
+      if (isLike) {
+        final Map<String, dynamic> map = live.toJson();
+        map['account_name'] = acc;
+        map['is_favourite'] = 1;
+        await _sqlDb.insertMapData(tableChannelLives, map);
+      }
       return true;
+    } catch (e) {
+      debugPrint("Error saveFavoriteLiveModel: $e");
+      return false;
     }
   }
 
   Future<List<ChannelMovie>> getFavMovies({int? page, int? pageSize}) async {
     try {
-      final user = await AuthLocale.getUser();
-
       final offset = page == null ? null : (page - 1) * (pageSize ?? 10);
-
       final database = await _sqlDb.readDataQuery(
         tableChannels,
         offset: offset,
         limit: pageSize,
-        where: "stream_type = ? AND account_name = ? AND is_favourite = ?",
-        whereArgs: ["movie", user!.accountName, 1],
+        where: "stream_type = ? AND is_favourite = ?",
+        whereArgs: ["movie", 1],
       );
-
       return database.map((e) => ChannelMovie.fromJson(e)).toList();
     } catch (e) {
       debugPrint("Error Fav movies: $e");
@@ -52,18 +91,14 @@ class FavoriteLocale {
 
   Future<List<ChannelSerie>> getFavSeries({int? page, int? pageSize}) async {
     try {
-      final user = await AuthLocale.getUser();
-
       final offset = page == null ? null : (page - 1) * (pageSize ?? 10);
-
       final database = await _sqlDb.readDataQuery(
         tableChannels,
         limit: pageSize,
         offset: offset,
-        where: "stream_type = ? AND account_name = ? AND is_favourite = ?",
-        whereArgs: ["serie", user!.accountName, 1],
+        where: "stream_type = ? AND is_favourite = ?",
+        whereArgs: ["serie", 1],
       );
-
       return database.map((e) => ChannelSerie.fromJson(e)).toList();
     } catch (e) {
       debugPrint("Error Fav Series: $e");
@@ -73,16 +108,13 @@ class FavoriteLocale {
 
   Future<List<ChannelLive>> getFavLives({int? page, int? pageSize}) async {
     try {
-      final user = await AuthLocale.getUser();
-
       final offset = page == null ? null : (page - 1) * (pageSize ?? 10);
-
       final database = await _sqlDb.readDataQuery(
         tableChannelLives,
         limit: pageSize,
         offset: offset,
-        where: "account_name = ? AND is_favourite = ?",
-        whereArgs: [user!.accountName, 1],
+        where: "is_favourite = ?",
+        whereArgs: [1],
       );
       return database.map((e) => ChannelLive.fromJson(e)).toList();
     } catch (e) {
@@ -93,94 +125,11 @@ class FavoriteLocale {
 }
 
 class WatchingLocale {
-  Future<bool> saveWatchingMovie(List<WatchingModel> movies) async {
-    try {
-      final user = await AuthLocale.getUser();
-      if (user == null) {
-        return false;
-      }
-
-      return true;
-    } catch (e) {
-      debugPrint("Error: watch Movie: $e");
-      return true;
-    }
-  }
-
-  Future<bool> saveWatchSerie(List<WatchingModel> series) async {
-    try {
-      final user = await AuthLocale.getUser();
-      if (user == null) {
-        return false;
-      }
-
-      return true;
-    } catch (e) {
-      debugPrint("Error: watch Series: $e");
-      return true;
-    }
-  }
-
-  Future<bool> saveWatchLive(List<WatchingModel> series) async {
-    try {
-      final user = await AuthLocale.getUser();
-      if (user == null) {
-        return false;
-      }
-
-      return true;
-    } catch (e) {
-      debugPrint("Error: watch Live: $e");
-      return true;
-    }
-  }
-
-  Future<List<WatchingModel>> getWatchingMovies() async {
-    try {
-      final user = await AuthLocale.getUser();
-      if (user == null) {
-        return [];
-      }
-
-      return [];
-    } catch (e) {
-      debugPrint("Error: Getwatch Movie: $e");
-      return [];
-    }
-  }
-
-  Future<List<WatchingModel>> getWatchingSeries() async {
-    try {
-      final user = await AuthLocale.getUser();
-      if (user == null) {
-        return [];
-      }
-
-      return [];
-    } catch (e) {
-      debugPrint("Error: Getwatch Series: $e");
-      return [];
-    }
-  }
-
-  Future<List<WatchingModel>> getWatchingLives() async {
-    try {
-      final user = await AuthLocale.getUser();
-      if (user == null) {
-        return [];
-      }
-
-      return [];
-    } catch (e) {
-      debugPrint("Error: Getwatch Live: $e");
-      return [];
-    }
-  }
-
-  Future<void> deleteWatching() async {
-    final user = await AuthLocale.getUser();
-    if (user == null) {
-      return;
-    }
-  }
+  Future<bool> saveWatchingMovie(List<WatchingModel> movies) async => true;
+  Future<bool> saveWatchSerie(List<WatchingModel> series) async => true;
+  Future<bool> saveWatchLive(List<WatchingModel> series) async => true;
+  Future<List<WatchingModel>> getWatchingMovies() async => [];
+  Future<List<WatchingModel>> getWatchingSeries() async => [];
+  Future<List<WatchingModel>> getWatchingLives() async => [];
+  Future<void> deleteWatching() async {}
 }

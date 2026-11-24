@@ -436,18 +436,39 @@ class CardHomeFavChannelsItem extends StatelessWidget {
                                 .toList()
                                 .isNotEmpty;
 
-                            return IconButton(
-                              icon: Icon(
-                                isLiked
-                                    ? FontAwesomeIcons.solidHeart
-                                    : FontAwesomeIcons.heart,
-                                color: Colors.white,
+                            return Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  context
+                                      .read<FavoritesCubit>()
+                                      .addLive(model!, isAdd: !isLiked);
+                                },
+                                child: Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.68),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isLiked
+                                          ? const Color(0xFFFF4D6D)
+                                          : const Color(0x88D5B055),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      isLiked
+                                          ? FontAwesomeIcons.solidHeart
+                                          : FontAwesomeIcons.heart,
+                                      size: 13,
+                                      color: isLiked
+                                          ? const Color(0xFFFF4D6D)
+                                          : const Color(0xFFFCE38A),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              onPressed: () {
-                                context
-                                    .read<FavoritesCubit>()
-                                    .addLive(model!, isAdd: !isLiked);
-                              },
                             );
                           },
                         ),

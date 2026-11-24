@@ -6,12 +6,16 @@ class CardMovieItem extends StatelessWidget {
       required this.onTap,
       required this.image,
       required this.name,
-      this.rate});
+      this.rate,
+      this.isFavorite = false,
+      this.onFavoriteToggle});
 
   final Function() onTap;
   final String image;
   final String name;
   final double? rate;
+  final bool isFavorite;
+  final VoidCallback? onFavoriteToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +75,39 @@ class CardMovieItem extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (onFavoriteToggle != null)
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: GestureDetector(
+                      onTap: onFavoriteToggle,
+                      child: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.65),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isFavorite
+                                ? const Color(0xFFFF4D6D)
+                                : const Color(0x88D5B055),
+                            width: 1,
+                          ),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            isFavorite
+                                ? FontAwesomeIcons.solidHeart
+                                : FontAwesomeIcons.heart,
+                            size: 13,
+                            color: isFavorite
+                                ? const Color(0xFFFF4D6D)
+                                : const Color(0xFFFCE38A),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 if (isHovered)
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
