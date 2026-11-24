@@ -11,6 +11,32 @@ class IpTvApi {
     _serieCatCache.clear();
   }
 
+  static bool isAdultCategory(CategoryModel item) {
+    return _isAdultBlocked(item.categoryName ?? "", item.categoryId);
+  }
+
+  static bool _isAdultBlocked(String name, String? catId) {
+    if (catId == "16" || catId == "382") return true;
+    final u = name.toUpperCase();
+    if (u.contains("ADULT SWIM") || u.contains("ADULT-SWIM")) return false;
+    return u.contains("FOR ADULTS") ||
+        u.contains("ADULT") ||
+        u.contains("XXX") ||
+        u.contains("PORN") ||
+        u.contains("18+") ||
+        u.contains("+18") ||
+        u.contains("EROTIC") ||
+        u.contains("SEX ") ||
+        u.contains("PLAYBOY") ||
+        u.contains("BRAZZERS") ||
+        u.contains("HUSTLER") ||
+        u.contains("PENTHOUSE") ||
+        u.contains("REDLIGHT") ||
+        u.contains("DORCEL") ||
+        name.contains("إباح") ||
+        name.contains("اباح");
+  }
+
   static bool _isArabicOrSportsPriority(String name) {
     final u = name.toUpperCase();
     return u.contains("AR|") ||
@@ -81,7 +107,10 @@ class IpTvApi {
       if (response.statusCode == 200) {
         final List<dynamic> json = jsonDecode(response.data ?? "[]");
 
-        final list = json.map((e) => CategoryModel.fromJson(e)).toList();
+        final list = json
+            .map((e) => CategoryModel.fromJson(e))
+            .where((item) => !_isAdultBlocked(item.categoryName ?? "", item.categoryId))
+            .toList();
         final priority = <CategoryModel>[];
         final rest = <CategoryModel>[];
         for (final item in list) {

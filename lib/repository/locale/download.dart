@@ -54,7 +54,10 @@ class ChannelsLocale {
         whereArgs: [type, user!.accountName],
       );
 
-      return database.map((e) => CategoryModel.fromJson(e)).toList();
+      return database
+          .map((e) => CategoryModel.fromJson(e))
+          .where((item) => !IpTvApi.isAdultCategory(item))
+          .toList();
     } catch (e) {
       debugPrint("Error get channels $type: $e");
       return [];
@@ -259,7 +262,10 @@ class LiveLocale {
         whereArgs: ["lives", user!.accountName],
       );
 
-      return database.map((e) => CategoryModel.fromJson(e)).toList();
+      return database
+          .map((e) => CategoryModel.fromJson(e))
+          .where((item) => !IpTvApi.isAdultCategory(item))
+          .toList();
     } catch (e) {
       debugPrint("Error get channels lives: $e");
       return [];
