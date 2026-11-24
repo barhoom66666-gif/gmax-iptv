@@ -253,33 +253,40 @@ class _VipPinLockGateState extends State<VipPinLockGate> {
   }
 
   Widget _buildKey(String label, {VoidCallback? onTap, bool isGold = false}) {
-    return GestureDetector(
-      onTap: onTap ?? () => _onDigit(label),
-      child: Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          gradient: isGold
-              ? const LinearGradient(
-                  colors: [Color(0xFFE5C158), Color(0xFF9A711C)],
-                )
-              : null,
-          color: isGold ? null : const Color(0xCC1E2933),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: const Color(0x66D5B055),
-            width: 1.2,
+    return HoverButton(
+      onPressed: onTap ?? () => _onDigit(label),
+      builder: (context, states) {
+        final isFocused = states.isFocused || states.isHovering;
+        return Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: isGold || isFocused
+                ? const LinearGradient(
+                    colors: [Color(0xFFE5C158), Color(0xFF9A711C)],
+                  )
+                : null,
+            color: (isGold || isFocused) ? null : const Color(0xCC1E2933),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isFocused
+                  ? const Color(0xFFFFFFFF)
+                  : const Color(0x66D5B055),
+              width: isFocused ? 2.2 : 1.2,
+            ),
           ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontFamily: kFontFamily,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: isGold ? const Color(0xFF090C10) : const Color(0xFFFCE38A),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontFamily: kFontFamily,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: (isGold || isFocused)
+                  ? const Color(0xFF090C10)
+                  : const Color(0xFFFCE38A),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

@@ -17,49 +17,56 @@ class _HomePageState extends State<HomePage> {
     required VoidCallback onTap,
     double fontSize = 15,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xB826333D),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: const Color(0x45D5B055),
-            width: 1,
+    return HoverButton(
+      onPressed: onTap,
+      builder: (context, states) {
+        final isFocused = states.isFocused || states.isHovering;
+        return Container(
+          decoration: BoxDecoration(
+            color: isFocused
+                ? const Color(0xD9334552)
+                : const Color(0xB826333D),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isFocused
+                  ? const Color(0xFFFCE38A)
+                  : const Color(0x45D5B055),
+              width: isFocused ? 2.2 : 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.35),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.35),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            icon,
-            const SizedBox(height: 10),
-            Text(
-              kIsArabicLang ? arLabel : enLabel,
-              style: styleTitle.copyWith(
-                fontSize: fontSize,
-                color: Colors.white,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              icon,
+              const SizedBox(height: 10),
+              Text(
+                kIsArabicLang ? arLabel : enLabel,
+                style: styleTitle.copyWith(
+                  fontSize: fontSize,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              kIsArabicLang ? enLabel : arLabel,
-              style: styleBody.copyWith(
-                fontSize: 11,
-                color: const Color(0xFFE5C158),
+              const SizedBox(height: 2),
+              Text(
+                kIsArabicLang ? enLabel : arLabel,
+                style: styleBody.copyWith(
+                  fontSize: 11,
+                  color: const Color(0xFFE5C158),
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -67,25 +74,32 @@ class _HomePageState extends State<HomePage> {
     required IconData icon,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0x991A222A),
-          borderRadius: BorderRadius.circular(7),
-          border: Border.all(
-            color: const Color(0x40D5B055),
-            width: 1,
+    return HoverButton(
+      onPressed: onTap,
+      builder: (context, states) {
+        final isFocused = states.isFocused || states.isHovering;
+        return Container(
+          decoration: BoxDecoration(
+            color: isFocused
+                ? const Color(0xCC2C3A46)
+                : const Color(0x991A222A),
+            borderRadius: BorderRadius.circular(7),
+            border: Border.all(
+              color: isFocused
+                  ? const Color(0xFFFCE38A)
+                  : const Color(0x40D5B055),
+              width: isFocused ? 2 : 1,
+            ),
           ),
-        ),
-        child: Center(
-          child: Icon(
-            icon,
-            color: const Color(0xFFD5B055),
-            size: 24,
+          child: Center(
+            child: Icon(
+              icon,
+              color: const Color(0xFFD5B055),
+              size: 24,
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
