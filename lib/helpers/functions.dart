@@ -129,10 +129,43 @@ Future<void> goFullScreen(bool value) async {
   }
 }
 
+const Map<String, String> _kSuperscriptCharMap = {
+  '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4',
+  '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
+  '⁺': '+', '⁻': '-', '⁼': '=', '⁽': '(', '⁾': ')',
+  '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4',
+  '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9',
+  'ᴬ': 'A', 'ᴮ': 'B', 'ꟲ': 'C', 'ᴰ': 'D', 'ᴱ': 'E',
+  'ꟳ': 'F', 'ᴳ': 'G', 'ᴴ': 'H', 'ᴵ': 'I', 'ᴶ': 'J',
+  'ᴷ': 'K', 'ᴸ': 'L', 'ᴹ': 'M', 'ᴺ': 'N', 'ᴼ': 'O',
+  'ᴾ': 'P', 'ꟴ': 'Q', 'ᴿ': 'R', 'ᵀ': 'T', 'ᵁ': 'U',
+  'ⱽ': 'V', 'ᵂ': 'W',
+  'ᵃ': 'A', 'ᵇ': 'B', 'ᶜ': 'C', 'ᵈ': 'D', 'ᵉ': 'E',
+  'ᶠ': 'F', 'ᵍ': 'G', 'ʰ': 'H', 'ⁱ': 'I', 'ᶦ': 'I',
+  'ʲ': 'J', 'ᵏ': 'K', 'ˡ': 'L', 'ᵐ': 'M', 'ⁿ': 'N',
+  'ᵒ': 'O', 'ᵖ': 'P', 'ʳ': 'R', 'ˢ': 'S', 'ᵗ': 'T',
+  'ᵘ': 'U', 'ᵛ': 'V', 'ʷ': 'W', 'ˣ': 'X', 'ʸ': 'Y', 'ᶻ': 'Z',
+  'ᴀ': 'A', 'ʙ': 'B', 'ᴄ': 'C', 'ᴅ': 'D', 'ᴇ': 'E',
+  'ꜰ': 'F', 'ɢ': 'G', 'ʜ': 'H', 'ɪ': 'I', 'ᴊ': 'J',
+  'ᴋ': 'K', 'ʟ': 'L', 'ᴍ': 'M', 'ɴ': 'N', 'ᴏ': 'O',
+  'ᴘ': 'P', 'ʀ': 'R', 'ѕ': 'S', 'ᴛ': 'T', 'ᴜ': 'U',
+  'ᴠ': 'V', 'ᴡ': 'W', 'ʏ': 'Y', 'ᴢ': 'Z',
+  '☼': '', '☾': '', '⎋': '', '✟': '', '◉': '•', '▼': '', '▶': '',
+};
+
+String _cleanFancyUnicode(String input) {
+  final sb = StringBuffer();
+  for (int i = 0; i < input.length; i++) {
+    final ch = input[i];
+    sb.write(_kSuperscriptCharMap[ch] ?? ch);
+  }
+  return sb.toString().replaceAll(RegExp(r' {2,}'), ' ').trim();
+}
+
 ///SQL
 String? sanitizeString(dynamic value) {
   if (value == null) return null;
-  final s = value.toString().trim();
+  final s = _cleanFancyUnicode(value.toString());
   if (s.isEmpty || s.toLowerCase() == 'null') {
     return null;
   }
