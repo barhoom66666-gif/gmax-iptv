@@ -4,23 +4,37 @@ class AuthLocale {
   static String _normalizeDomain(String rawDomain) {
     final clean = rawDomain.trim().replaceAll(RegExp(r'/+$'), '');
     if (clean == "https://demo.gmax.iptv" || clean.isEmpty) return clean;
-    try {
-      final uri = Uri.parse(clean);
-      if (uri.scheme == 'http' && (!uri.hasPort || uri.port == 80)) {
-        return "${uri.scheme}://${uri.host}:8080";
-      }
-    } catch (_) {}
+    if (clean.contains("business-cloud-8.ru")) {
+      return "http://cf.uscahd.xyz";
+    }
     return clean;
   }
 
   static Future<bool> saveUser(UserModel user) async {
     try {
+      // Remove any existing entry with the exact same username OR exact same account_name
+      final existing = await _sqlDb.readDataQuery(tableUsers);
+      for (final row in existing) {
+        final rowAcc = row['account_name']?.toString() ?? '';
+        String rowUser = '';
+        try {
+          if (row['user_info'] != null) {
+            final uMap = row['user_info'] is String
+                ? jsonDecode(row['user_info'])
+                : row['user_info'];
+            rowUser = uMap['username']?.toString() ?? '';
+          }
+        } catch (_) {}
+        if (rowAcc == user.accountName ||
+            (rowUser.isNotEmpty && rowUser == (user.userInfo?.username ?? ''))) {
+          await _sqlDb.deleteData("DELETE FROM '$tableUsers' WHERE id = ${row['id']}");
+        }
+      }
+
       await _sqlDb.insertMapData(
         tableUsers,
         user.toJson(),
       );
-      // debugPrint("Created: ${user.accountName} || active: ${user.active} || RES:$res");
-
       return true;
     } catch (e) {
       debugPrint("Error Save New User: $e");
@@ -36,11 +50,8 @@ class AuthLocale {
         whereArgs: [1],
       );
 
-      // debugPrint("Users active: ${users.length}");
-
       if (users.isNotEmpty) {
         final user = users.first;
-
         return UserModel.fromJson(
           user,
           user['account_name'],
@@ -58,14 +69,7 @@ class AuthLocale {
 
   static Future<List<UserModel>> getListUsers() async {
     try {
-      final users = await _sqlDb.readDataQuery(
-        tableUsers,
-        //  where: 'active = ?',
-        // whereArgs: [1],
-      );
-
-      // debugPrint("Users active: ${users.length}");
-
+      final users = await _sqlDb.readDataQuery(tableUsers);
       return users
           .map((user) => UserModel.fromJson(
                 user,
@@ -74,6 +78,8 @@ class AuthLocale {
                 user['type_login'],
                 user['active'],
               ))
+          .toList()
+          .reversed
           .toList();
     } catch (e) {
       debugPrint("Error Get save User: $e");
@@ -89,11 +95,9 @@ class AuthLocale {
         whereArgs: [1],
       );
 
-      //TODO: update all users to active 0
       for (var user in users) {
-        var response = await _sqlDb.updateData(
+        await _sqlDb.updateData(
             "UPDATE '$tableUsers' SET 'active' = '0' WHERE id = ${user['id']}");
-        debugPrint("RESPONSE user: ${user['account_name']} is $response");
       }
 
       return true;
@@ -131,7 +135,6 @@ class AuthLocale {
         whereArgs: [accountName],
       );
 
-      //TODO: update all users to active 0
       for (var user in users) {
         await _sqlDb.updateData(
             "UPDATE '$tableUsers' SET 'active' = '1' WHERE id = ${user['id']}");

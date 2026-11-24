@@ -45,9 +45,7 @@ final router = GoRouter(
       builder: (context, state, child) {
         return BlocBuilder<AuthBloc, AuthState>(
           builder: (context, stateAuth) {
-            if (stateAuth is AuthLoading) {
-              return const Center(child: ProgressRing());
-            } else if (stateAuth is AuthSuccess) {
+            if (stateAuth is AuthSuccess) {
               return SafeArea(
                 left: !UniversalPlatform.isDesktopOrWeb,
                 right: false,

@@ -12,9 +12,18 @@ class AuthApi {
     try {
       final cleanUser = username.trim();
       final cleanPass = password.trim();
-      var cleanUrl = url.trim().replaceAll(RegExp(r'\s+'), '').replaceAll(RegExp(r'/+$'), '');
+      var cleanUrl = url
+          .trim()
+          .replaceAll(RegExp(r'\s+'), '')
+          .replaceAll(RegExp(r'/+$'), '');
       if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
         cleanUrl = 'http://$cleanUrl';
+      }
+
+      // Generate a unique account name if empty or generic so it never overwrites previous codes
+      var finalAccountName = accountName.trim();
+      if (finalAccountName.isEmpty || finalAccountName == "user") {
+        finalAccountName = "كود ($cleanUser)";
       }
 
       if (cleanUrl == "https://demo.gmax.iptv" || cleanUser == "demo") {
@@ -40,33 +49,38 @@ class AuthApi {
             "rtmp_port": "80",
             "timezone": "UTC",
             "timestamp_now": 1700000000,
-            "time_now": "2026-11-23 12:00:00",
+            "time_now": "2026-11-24 12:00:00",
             "process": true
           }
         };
         final user = UserModel.fromJson(
-            demoJson, accountName, "https://demo.gmax.iptv", typeLogin, 1);
+            demoJson, finalAccountName, "https://demo.gmax.iptv", typeLogin, 1);
         await AuthLocale.logOut();
-        if (addToPlayList) {
-          await AuthLocale.saveUser(user);
-        } else {
-          await AuthLocale.updateStatusUser(user.accountName);
-        }
+        await AuthLocale.saveUser(user);
         return user;
       }
 
-      // Build candidate URLs: try :8080 and :2095 automatically to bypass ISP port-80 blocks (like Etisalat safe.etisalat.ae)
-      final Uri parsed = Uri.parse(cleanUrl);
-      final String baseHost = "${parsed.scheme}://${parsed.host}";
+      // Build candidate URLs including automatic UAE anti-block mirrors for World 8K
       final List<String> candidates = [];
-      if (!parsed.hasPort || parsed.port == 80) {
-        candidates.add("$baseHost:8080");
-        candidates.add("$baseHost:2095");
-        candidates.add(cleanUrl);
-      } else {
-        candidates.add(cleanUrl);
-        if (parsed.port != 8080) candidates.add("$baseHost:8080");
-        if (parsed.port != 2095) candidates.add("$baseHost:2095");
+      if (cleanUrl.contains("business-cloud-8.ru") || cleanUrl.contains("uscahd.xyz")) {
+        candidates.add("http://cf.uscahd.xyz");
+        candidates.add("http://pro.uscahd.xyz");
+        candidates.add("http://cf.uscahd.xyz:8080");
+        candidates.add("http://pro.uscahd.xyz:8080");
+      }
+
+      try {
+        final Uri parsed = Uri.parse(cleanUrl);
+        final String baseHost = "${parsed.scheme}://${parsed.host}";
+        if (!candidates.contains(cleanUrl)) candidates.add(cleanUrl);
+        if (!parsed.hasPort || parsed.port == 80) {
+          if (!candidates.contains("$baseHost:8080")) candidates.add("$baseHost:8080");
+          if (!candidates.contains("$baseHost:2095")) candidates.add("$baseHost:2095");
+        } else {
+          if (!candidates.contains(baseHost)) candidates.add(baseHost);
+        }
+      } catch (_) {
+        if (!candidates.contains(cleanUrl)) candidates.add(cleanUrl);
       }
 
       for (final candidateDomain in candidates) {
@@ -76,9 +90,9 @@ class AuthApi {
           final Response<String> response = await _dio.get(
             link,
             options: Options(
-              headers: {'User-Agent': 'IPTVSmartersPlayer'},
-              receiveTimeout: const Duration(seconds: 15),
-              sendTimeout: const Duration(seconds: 15),
+              headers: const {'User-Agent': 'IPTVSmartersPlayer'},
+              receiveTimeout: const Duration(seconds: 12),
+              sendTimeout: const Duration(seconds: 12),
             ),
           );
 
@@ -86,16 +100,16 @@ class AuthApi {
             final body = response.data!.trim();
             if (body.startsWith('{') && body.contains('user_info')) {
               final Map<String, dynamic> json = jsonDecode(body);
+              final uInfo = json['user_info'];
+              if (uInfo is Map && (uInfo['auth'] == 0 || uInfo['auth'] == '0')) {
+                showWarningToast("الكود غير مفعل أو انتهت صلاحيته");
+                return null;
+              }
               final user = UserModel.fromJson(
-                  json, accountName, candidateDomain, typeLogin, 1);
+                  json, finalAccountName, candidateDomain, typeLogin, 1);
 
               await AuthLocale.logOut();
-              if (addToPlayList) {
-                await AuthLocale.deleteUser(accountName);
-                await AuthLocale.saveUser(user);
-              } else {
-                await AuthLocale.updateStatusUser(user.accountName);
-              }
+              await AuthLocale.saveUser(user);
               return user;
             }
           }
@@ -104,7 +118,7 @@ class AuthApi {
         }
       }
 
-      showWarningToast("تعذر الاتصال بالسيرفر، تأكد من البيانات");
+      showWarningToast("تعذر الاتصال بالسيرفر، تأكد من الرابط أو الكود");
       return null;
     } catch (e) {
       debugPrint("Error: $e");

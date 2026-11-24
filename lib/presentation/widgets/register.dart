@@ -15,6 +15,7 @@ class _IntroImageAnimatedState extends State<IntroImageAnimated> {
     if (!mounted) return;
     const int second = 70;
     await Future.delayed(const Duration(milliseconds: 400));
+    if (!mounted || !controller.hasClients) return;
 
     await controller.animateTo(
       isImage ? controller.position.maxScrollExtent : 0,
@@ -55,13 +56,13 @@ class _IntroImageAnimatedState extends State<IntroImageAnimated> {
           ),
         ),
         Opacity(
-          opacity: .6,
+          opacity: .45,
           child: Container(
             width: getSize(context).width,
             height: getSize(context).height,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [kColorPrimary, kColorPrimaryDark],
+                colors: [Color(0xFF090C10), kColorPrimaryDark],
               ),
             ),
           ),
@@ -73,8 +74,8 @@ class _IntroImageAnimatedState extends State<IntroImageAnimated> {
               borderRadius: BorderRadius.circular(22),
               child: Image.asset(
                 kIconSplash,
-                width: getSize(context).width * .22,
-                height: getSize(context).width * .22,
+                width: getSize(context).width * .20,
+                height: getSize(context).width * .20,
                 fit: BoxFit.cover,
               ),
             ),
@@ -98,14 +99,19 @@ class _CardM3UState extends State<CardM3U> {
   final _name = TextEditingController();
   final _m3u = TextEditingController();
 
-  //text: "http://iptvizle.cloud:8080/player_api.php?username=hangout&password=01ak061"
+  void clearFieldsForNewCode() {
+    setState(() {
+      _name.clear();
+      _m3u.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         CardInputLoginTile(
-          label: 'الاسم / Name',
+          label: 'الاسم (اختياري)',
           controller: _name,
         ),
         const SizedBox(height: 10),
@@ -113,14 +119,15 @@ class _CardM3UState extends State<CardM3U> {
           label: 'رابط M3U',
           controller: _m3u,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         CardLoginCancel(
           progress: widget.isLoading,
+          onClear: clearFieldsForNewCode,
           onSave: () async {
             try {
               var txt = _m3u.text.trim().replaceAll(RegExp(r'\s+'), '');
               if (txt.isEmpty) {
-                showSoftToast("Enter your name and M3U/XTREME url");
+                showSoftToast("أدخل رابط M3U أولاً");
                 return;
               }
 
@@ -131,25 +138,28 @@ class _CardM3UState extends State<CardM3U> {
                 final domain =
                     "${url.scheme}://${url.host}${url.hasPort ? ":${url.port}" : ""}";
 
-                final username = parameters['username'].toString();
-                final password = parameters['password'].toString();
+                final username = (parameters['username'] ?? '').toString();
+                final password = (parameters['password'] ?? '').toString();
+
+                final accName = _name.text.trim().isEmpty
+                    ? "M3U ($username)"
+                    : _name.text.trim();
 
                 context.read<AuthBloc>().add(AuthRegister(
                       username,
                       password,
                       domain,
-                      _name.text.isEmpty ? "user" : _name.text,
+                      accName,
                       typeLogin: "XTREME",
                     ));
               } else {
-                showSoftToast("Your url M3U/XTREME is wrong!!");
+                showSoftToast("الرابط غير صحيح، تأكد من نسخ الرابط كاملاً");
               }
             } catch (e) {
               debugPrint("Error: wrong m3u");
               showWarningToast("Error: wrong m3u");
             }
           },
-          onClear: null,
         ),
       ],
     );
@@ -161,7 +171,6 @@ class CardLoginCancel extends StatelessWidget {
       {super.key, required this.onSave, this.onClear, this.progress = false});
 
   final bool progress;
-
   final Function() onSave;
   final Function()? onClear;
 
@@ -174,16 +183,17 @@ class CardLoginCancel extends StatelessWidget {
         children: [
           if (onClear != null && !progress)
             SizedBox(
-              width: 80,
-              height: 23,
+              width: 95,
+              height: 28,
               child: Button(
                 style: ButtonStyle(padding: ButtonState.all(EdgeInsets.zero)),
                 onPressed: onClear,
                 child: Center(
                   child: Text(
-                    "Clear",
+                    "تفريغ + جديد",
                     style: styleBody.copyWith(
                       color: Colors.white,
+                      fontSize: 11.5,
                     ),
                   ),
                 ),
@@ -191,8 +201,8 @@ class CardLoginCancel extends StatelessWidget {
             ),
           const SizedBox(width: 10),
           SizedBox(
-            width: 80,
-            height: 23,
+            width: 115,
+            height: 28,
             child: FilledButton(
               style: ButtonStyle(
                 padding: ButtonState.all(EdgeInsets.zero),
@@ -201,14 +211,16 @@ class CardLoginCancel extends StatelessWidget {
               child: Center(
                 child: !progress
                     ? Text(
-                        "Save",
+                        "حفظ وتشغيل",
                         style: styleBody.copyWith(
-                          color: Colors.white,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
                         ),
                       )
                     : LoadingAnimationWidget.staggeredDotsWave(
                         size: 20,
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
               ),
             ),
@@ -229,53 +241,147 @@ class CardXTREAM extends StatefulWidget {
 }
 
 class _CardXTREAMState extends State<CardXTREAM> {
-  final _name = TextEditingController(text: "Alzaabi 8K VIP");
-  final _username = TextEditingController(text: "8524fa5c8798");
-  final _password = TextEditingController(text: "a1aeb0b2de");
-  final _domain = TextEditingController(text: "http://cf.business-cloud-8.ru:8080");
+  final _name = TextEditingController();
+  final _username = TextEditingController();
+  final _password = TextEditingController();
+  final _domain = TextEditingController();
+
+  void clearFieldsForNewCode() {
+    setState(() {
+      _name.clear();
+      _domain.clear();
+      _username.clear();
+      _password.clear();
+    });
+  }
+
+  Future<void> _smartPasteFromClipboard() async {
+    try {
+      final data = await Clipboard.getData('text/plain');
+      final text = (data?.text ?? '').trim();
+      if (text.isEmpty) {
+        showSoftToast("الحافظة فارغة — انسخ رسالة الكود أولاً");
+        return;
+      }
+
+      // 1) Check if text contains an M3U get.php link with username=...&password=...
+      final m3uMatch = RegExp(
+              r'(https?:\/\/[^\s]+\/get\.php\?[^\s]+)',
+              caseSensitive: false)
+          .firstMatch(text);
+      if (m3uMatch != null) {
+        final uri = Uri.parse(m3uMatch.group(1)!);
+        _domain.text =
+            "${uri.scheme}://${uri.host}${uri.hasPort ? ':${uri.port}' : ''}";
+        _username.text = uri.queryParameters['username'] ?? _username.text;
+        _password.text = uri.queryParameters['password'] ?? _password.text;
+      }
+
+      // 2) Extract explicit username / password / url lines from WhatsApp message
+      final userMatch = RegExp(r'username\s*[:=]\s*([A-Za-z0-9_.-]+)',
+              caseSensitive: false)
+          .firstMatch(text);
+      final passMatch = RegExp(r'password\s*[:=]\s*([A-Za-z0-9_.-]+)',
+              caseSensitive: false)
+          .firstMatch(text);
+      final urlMatch =
+          RegExp(r'(https?:\/\/[A-Za-z0-9_.-]+(?::\d+)?)', caseSensitive: false)
+              .allMatches(text)
+              .map((m) => m.group(1)!)
+              .toList();
+
+      if (userMatch != null) _username.text = userMatch.group(1)!;
+      if (passMatch != null) _password.text = passMatch.group(1)!;
+      if (urlMatch.isNotEmpty) {
+        // Prefer uscahd.xyz if present in the message
+        final preferred = urlMatch.firstWhere(
+          (u) => u.contains("uscahd.xyz") && !u.contains("apps."),
+          orElse: () => urlMatch.first,
+        );
+        _domain.text = preferred;
+      }
+
+      if (_name.text.trim().isEmpty && _username.text.isNotEmpty) {
+        _name.text = "كود (${_username.text})";
+      }
+      setState(() {});
+      showSoftToast("تم لصق وتعبئة بيانات الكود تلقائياً ✓");
+    } catch (e) {
+      showSoftToast("تعذر اللصق التلقائي: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: Button(
+            onPressed: _smartPasteFromClipboard,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(FluentIcons.paste, size: 13, color: Color(0xFFFCE38A)),
+                const SizedBox(width: 6),
+                Text(
+                  "📋 لصق ذكي لكود الواتساب بالكامل",
+                  style: styleBody.copyWith(
+                    fontSize: 11,
+                    color: const Color(0xFFFCE38A),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
         CardInputLoginTile(
-          label: 'اسم الحساب',
+          label: 'اسم الكود (اختياري)',
           controller: _name,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         CardInputLoginTile(
-          label: 'السيرفر Domain',
+          label: 'السيرفر URL',
           controller: _domain,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         CardInputLoginTile(
           label: 'المستخدم User',
           controller: _username,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         CardInputLoginTile(
           label: 'كلمة السر Pass',
           controller: _password,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 14),
         CardLoginCancel(
+          progress: widget.isLoading,
+          onClear: clearFieldsForNewCode,
           onSave: () {
             if (_domain.text.trim().isEmpty ||
                 _username.text.trim().isEmpty ||
                 _password.text.trim().isEmpty) {
-              showSoftToast("Enter all the XTREME Info");
+              showSoftToast("أدخل رابط السيرفر واسم المستخدم وكلمة السر");
               return;
             }
 
-            final cleanDomain = _domain.text.trim().replaceAll(RegExp(r'/+$'), '');
+            final cleanDomain =
+                _domain.text.trim().replaceAll(RegExp(r'/+$'), '');
+            final cleanUser = _username.text.trim();
+            final accName = _name.text.trim().isEmpty
+                ? "كود ($cleanUser)"
+                : _name.text.trim();
+
             context.read<AuthBloc>().add(AuthRegister(
-                _username.text.trim(),
-                _password.text.trim(),
-                cleanDomain,
-                _name.text.trim().isEmpty ? "user" : _name.text.trim(),
-                typeLogin: "XTREME"));
+                  cleanUser,
+                  _password.text.trim(),
+                  cleanDomain,
+                  accName,
+                  typeLogin: "XTREME",
+                ));
           },
-          onClear: null,
         ),
       ],
     );
@@ -293,15 +399,15 @@ class CardInputLoginTile extends StatelessWidget {
     return Row(
       children: [
         SizedBox(
-          width: deviceIsWeb(context) ? 130 : 100,
+          width: deviceIsWeb(context) ? 130 : 105,
           child: Text(
             label,
-            style: styleBody,
+            style: styleBody.copyWith(fontSize: 11.5),
           ),
         ),
         Expanded(
           child: SizedBox(
-            height: 22,
+            height: 26,
             child: Center(
               child: TextBox(
                 controller: controller,
@@ -332,14 +438,16 @@ class CardPlaylistTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controllerDelete = FlyoutController();
-    const double sizeTxt = 10;
+    const double sizeTxt = 10.5;
+    final uname = model.userInfo?.username ?? "";
     return SizedBox(
-      height: kIsWeb ? 100 : 85,
+      height: kIsWeb ? 100 : 88,
       child: ListTile.selectable(
         title: Text(
           model.accountName,
           style: styleTitle.copyWith(
-            fontSize: deviceIsWeb(context) ? 11 : 14,
+            fontSize: deviceIsWeb(context) ? 11 : 13.5,
+            color: const Color(0xFFFCE38A),
           ),
         ),
         trailing: Center(
@@ -364,62 +472,37 @@ class CardPlaylistTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 10),
-            RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: 'Type: ',
-                    style: styleBody.copyWith(
-                      color: Colors.grey[110],
-                      fontSize: sizeTxt,
-                    ),
-                  ),
-                  TextSpan(
-                    text: model.typeLogin,
-                    style: styleBody.copyWith(
-                      color: Colors.white,
-                      fontSize: sizeTxt,
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 6),
+            Text(
+              "User: $uname  •  ${model.domain}",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: styleBody.copyWith(
+                color: Colors.white,
+                fontSize: sizeTxt,
               ),
             ),
-            const SizedBox(height: 5),
-            RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: 'Updated: ',
-                    style: styleBody.copyWith(
-                      color: Colors.grey[110],
-                      fontSize: sizeTxt,
-                    ),
-                  ),
-                  TextSpan(
-                    text: 'Yesterday at 7:39 PM',
-                    style: styleBody.copyWith(
-                      color: Colors.white,
-                      fontSize: sizeTxt,
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 3),
+            Text(
+              "اضغط لتشغيل هذا الكود مباشرة (${model.typeLogin})",
+              style: styleBody.copyWith(
+                color: const Color(0xFFD5B055),
+                fontSize: sizeTxt,
               ),
             ),
           ],
         ),
         leading: Center(
           child: CircleAvatar(
-            backgroundColor: Colors.grey[130],
-            radius: 20,
-            child: CircleAvatar(
-              radius: 19.5,
-              backgroundColor: Colors.grey,
-              child: Text(
-                model.accountName[0],
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
+            backgroundColor: kColorPrimary,
+            radius: 19,
+            child: Text(
+              model.accountName.isNotEmpty
+                  ? model.accountName[0].toUpperCase()
+                  : "A",
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -427,13 +510,12 @@ class CardPlaylistTile extends StatelessWidget {
         selected: selected,
         selectionMode: ListTileSelectionMode.single,
         onPressed: () {
-          debugPrint("Clicked");
           context.read<AuthBloc>().add(AuthRegister(
-                model.userInfo!.username ?? "",
-                model.userInfo!.password ?? "",
+                model.userInfo?.username ?? "",
+                model.userInfo?.password ?? "",
                 model.domain,
                 model.accountName,
-                addToPlayList: false,
+                addToPlayList: true,
                 typeLogin: model.typeLogin,
               ));
         },
@@ -459,7 +541,7 @@ class CardFluentDeletePlaylist extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Are you sure you want to proceed?\nDeleting this playlist will result in the deletion of all saved data associated with it.',
+                'هل تريد حذف هذا الكود المحفوظ نهائياً؟',
                 style: styleBody,
               ),
               const SizedBox(height: 15),
@@ -468,9 +550,9 @@ class CardFluentDeletePlaylist extends StatelessWidget {
                 children: [
                   Button(
                     child: Text(
-                      'Cancel',
+                      'إلغاء',
                       style: styleBody.copyWith(
-                        fontSize: deviceIsWeb(context) ? 10 : 12.5,
+                        fontSize: deviceIsWeb(context) ? 10 : 12,
                       ),
                     ),
                     onPressed: () {
@@ -481,9 +563,9 @@ class CardFluentDeletePlaylist extends StatelessWidget {
                   Button(
                     onPressed: onDelete,
                     child: Text(
-                      'Remove',
+                      'حذف',
                       style: styleBody.copyWith(
-                        fontSize: deviceIsWeb(context) ? 10 : 12.5,
+                        fontSize: deviceIsWeb(context) ? 10 : 12,
                       ),
                     ),
                   ),
@@ -498,9 +580,10 @@ class CardFluentDeletePlaylist extends StatelessWidget {
 }
 
 class CardMyPlaylists extends StatefulWidget {
-  const CardMyPlaylists({super.key, required this.isLoading});
+  const CardMyPlaylists({super.key, required this.isLoading, this.onAddNewTap});
 
   final bool isLoading;
+  final VoidCallback? onAddNewTap;
 
   @override
   State<CardMyPlaylists> createState() => _CardMyPlaylistsState();
@@ -513,21 +596,39 @@ class _CardMyPlaylistsState extends State<CardMyPlaylists> {
       future: AuthLocale.getListUsers(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          final users = snapshot.data;
+          final users = snapshot.data ?? [];
+          if (users.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "لا توجد أكواد محفوظة بعد",
+                    style: styleBody,
+                  ),
+                  const SizedBox(height: 10),
+                  if (widget.onAddNewTap != null)
+                    FilledButton(
+                      onPressed: widget.onAddNewTap,
+                      child: const Text("إضافة كود جديد +"),
+                    ),
+                ],
+              ),
+            );
+          }
 
           return ListView.builder(
-            itemCount: users!.length,
+            itemCount: users.length,
             itemBuilder: (_, index) {
               final user = users[index];
               return CardPlaylistTile(
-                model: users[index],
+                model: user,
                 onDelete: () {
                   context
                       .read<AuthBloc>()
                       .add(DeleteUserEvent(accountName: user.accountName));
 
                   setState(() {});
-                  //close dialog
                   Navigator.pop(context);
                 },
               );

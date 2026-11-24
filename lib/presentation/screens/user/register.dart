@@ -12,6 +12,8 @@ class _RegisterPageState extends State<RegisterPage>
   late material.TabController tabController;
 
   final int lengthTab = 3;
+  final GlobalKey<_CardXTREAMState> _xtreamKey = GlobalKey<_CardXTREAMState>();
+  final GlobalKey<_CardM3UState> _m3uKey = GlobalKey<_CardM3UState>();
 
   @override
   void initState() {
@@ -19,6 +21,7 @@ class _RegisterPageState extends State<RegisterPage>
     tabController = material.TabController(
       length: lengthTab,
       vsync: this,
+      initialIndex: 1, // Open on XTREME tab by default
     );
   }
 
@@ -28,12 +31,17 @@ class _RegisterPageState extends State<RegisterPage>
     super.dispose();
   }
 
+  void _startAddNewCode() {
+    tabController.animateTo(1);
+    _xtreamKey.currentState?.clearFieldsForNewCode();
+    _m3uKey.currentState?.clearFieldsForNewCode();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = material.Theme.of(context);
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
-        debugPrint("SETTING: ${state.setting}");
         return CardCHeck(
           setting: state.setting,
           child: Container(
@@ -43,7 +51,7 @@ class _RegisterPageState extends State<RegisterPage>
               children: [
                 SizedBox(
                   width:
-                      getSize(context).width * (deviceIsWeb(context) ? .5 : .4),
+                      getSize(context).width * (deviceIsWeb(context) ? .42 : .35),
                   child: const IntroImageAnimated(),
                 ),
                 Expanded(
@@ -51,26 +59,51 @@ class _RegisterPageState extends State<RegisterPage>
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Column(
                       children: [
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 12),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'إضافة اشتراك / NEW PLAYLIST',
-                              style: styleTitle.copyWith(fontSize: 15),
+                            // "+ Add New Code" button (clears fields to add a new code)
+                            FilledButton(
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    ButtonState.all(const Color(0xFFD5B055)),
+                              ),
+                              onPressed: _startAddNewCode,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    FluentIcons.add,
+                                    size: 12,
+                                    color: Colors.black,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    "إضافة كود جديد +",
+                                    style: styleBody.copyWith(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 11.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+
+                            // Quick 1-tap button for the new 24h Trial (151ea3ffc3b2 on cf.uscahd.xyz)
                             FilledButton(
                               onPressed: () {
                                 context.read<AuthBloc>().add(AuthRegister(
-                                      "8524fa5c8798",
-                                      "a1aeb0b2de",
-                                      "http://cf.business-cloud-8.ru:8080",
-                                      "Alzaabi 8K VIP",
+                                      "151ea3ffc3b2",
+                                      "fc9bcff236",
+                                      "http://cf.uscahd.xyz",
+                                      "World 8K (151ea3ffc3b2)",
                                       typeLogin: "XTREME",
                                     ));
                               },
                               child: Text(
-                                "▶ تشغيل اشتراكي الفوري (World 8K)",
+                                "▶ تشغيل كود التجربة الجديد (24h)",
                                 style: styleBody.copyWith(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
@@ -80,13 +113,13 @@ class _RegisterPageState extends State<RegisterPage>
                             ),
                           ],
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 12),
                         SizedBox(
                           width: getSize(context).width,
                           child: Row(
                             children: [
                               SizedBox(
-                                width: deviceIsWeb(context) ? 130 : 100,
+                                width: deviceIsWeb(context) ? 110 : 85,
                                 child: Text(
                                   'نوع القائمة',
                                   style: styleBody,
@@ -94,7 +127,7 @@ class _RegisterPageState extends State<RegisterPage>
                               ),
                               Expanded(
                                 child: GFSegmentTabs(
-                                  height: 24,
+                                  height: 26,
                                   tabController: tabController,
                                   tabBarColor: theme.scaffoldBackgroundColor,
                                   labelColor: Colors.black,
@@ -111,7 +144,11 @@ class _RegisterPageState extends State<RegisterPage>
                                   length: lengthTab,
                                   indicatorPadding: EdgeInsets.zero,
                                   labelPadding: EdgeInsets.zero,
-                                  tabs: ["M3U", "XTREME", "القوائم"]
+                                  tabs: [
+                                    "رابط M3U",
+                                    "كود XTREME",
+                                    "الأكواد المحفوظة"
+                                  ]
                                       .map(
                                         (text) => Text(
                                           text,
@@ -126,10 +163,10 @@ class _RegisterPageState extends State<RegisterPage>
                             ],
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 14),
                         SizedBox(
                           width: getSize(context).width,
-                          height: getSize(context).height,
+                          height: getSize(context).height * 0.72,
                           child: BlocConsumer<AuthBloc, AuthState>(
                             listener: (context, state) {
                               if (state is AuthSuccess) {
@@ -144,9 +181,13 @@ class _RegisterPageState extends State<RegisterPage>
                               return GFTabBarView(
                                 controller: tabController,
                                 children: [
-                                  CardM3U(isLoading: isLoading),
-                                  CardXTREAM(isLoading: isLoading),
-                                  CardMyPlaylists(isLoading: isLoading),
+                                  CardM3U(key: _m3uKey, isLoading: isLoading),
+                                  CardXTREAM(
+                                      key: _xtreamKey, isLoading: isLoading),
+                                  CardMyPlaylists(
+                                    isLoading: isLoading,
+                                    onAddNewTap: _startAddNewCode,
+                                  ),
                                 ],
                               );
                             },

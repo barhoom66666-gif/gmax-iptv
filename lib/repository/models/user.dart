@@ -43,12 +43,9 @@ class UserModel {
   static String _fixPort80Domain(String raw) {
     final clean = raw.trim().replaceAll(RegExp(r'/+$'), '');
     if (clean == "https://demo.gmax.iptv" || clean.isEmpty) return clean;
-    try {
-      final uri = Uri.parse(clean);
-      if (uri.scheme == 'http' && (!uri.hasPort || uri.port == 80)) {
-        return "${uri.scheme}://${uri.host}:8080";
-      }
-    } catch (_) {}
+    if (clean.contains("business-cloud-8.ru")) {
+      return "http://cf.uscahd.xyz";
+    }
     return clean;
   }
 
